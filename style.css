@@ -2706,9 +2706,9 @@ select {
   margin-bottom: 0 !important;
 }
 
-/* 移除 Hero 背景光晕（太花哨） */
+/* Hero 背景光晕 - 保留但减弱 */
 .hero::before {
-  display: none;
+  opacity: 0.3;
 }
 
 /* 筛选栏紧凑模式 */
@@ -2795,26 +2795,20 @@ select {
   padding: 12px !important;
 }
 
-/* 移除帖子卡片入场动画（更简洁） */
+/* 帖子卡片入场动画 - 保留但加快 */
 .post-card {
-  animation: none !important;
-  opacity: 1 !important;
+  animation: cardFadeIn 0.35s ease forwards !important;
+  opacity: 0 !important;
 }
 
-/* 移除按钮微光效果 */
-.btn-primary::after {
-  display: none;
-}
+/* 按钮微光效果 - 保留 */
+/* (使用原始样式，不覆盖) */
 
-/* 移除筛选标签微光 */
-.filter-chip.active::after {
-  display: none;
-}
+/* 筛选标签微光 - 保留 */
+/* (使用原始样式，不覆盖) */
 
-/* FAB 按钮呼吸更柔和 */
-.tab-fab {
-  animation: none !important;
-}
+/* FAB 按钮呼吸光晕 - 保留 */
+/* (使用原始样式，不覆盖) */
 
 /* 底部 Tab 栏精简 */
 .tab-bar {
@@ -2841,15 +2835,11 @@ select {
   height: 22px !important;
 }
 
-/* 移除导航栏底部微光 */
-.navbar::after {
-  display: none;
-}
+/* 导航栏底部微光 - 保留 */
+/* (使用原始样式，不覆盖) */
 
-/* 移除底部 Tab 顶部微光 */
-.tab-bar::before {
-  display: none;
-}
+/* 底部 Tab 顶部微光 - 保留 */
+/* (使用原始样式，不覆盖) */
 
 /* 空状态精简 */
 .empty-state {
