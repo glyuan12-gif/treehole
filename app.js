@@ -54,6 +54,16 @@ const TAGS = {
   share: '分享'
 };
 
+// 情绪反应映射
+const EMOTIONS = {
+  touched: { emoji: '🥴', label: '感动' },
+  empathy: { emoji: '🤗', label: '心疼' },
+  resonate: { emoji: '💪', label: '共鸣' },
+  agree: { emoji: '👏', label: '赞同' },
+  think: { emoji: '🤔', label: '深思' },
+  warm: { emoji: '☀️', label: '温暖' }
+};
+
 // 角色映射
 const ROLES = {
   student: { name: '学生党', icon: '🎓' },
@@ -65,7 +75,7 @@ const ROLES = {
 // 可选 Emoji 列表（72个）
 const EMOJI_LIST = [
   '😊','😂','🥰','😎','🤔','😢','😤','🥺',
-  '😴','🤗','😇','🙃','😋','🤩','🥳','😇',
+  '😴','🤗','😇','🙃','😋','🤩','🥳','🤭',
   '🤭','🫣','🫢','🤫','😏','😒','🙄','😬',
   '😌','🤓','🧐','😈','👻','💀','🤖','👽',
   '🐱','🐶','🐻','🦊','🐰','🐼','🐨','🐯',
@@ -161,7 +171,7 @@ const App = {
 
 // 生成唯一 ID
 function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 11);
 }
 
 // 时间格式化
@@ -183,13 +193,6 @@ function formatDateTime(timestamp) {
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit'
   }).format(new Date(timestamp));
-}
-
-// 随机昵称
-function randomNickname() {
-  const adj = NICKNAME_ADJECTIVES[Math.floor(Math.random() * NICKNAME_ADJECTIVES.length)];
-  const noun = NICKNAME_NOUNS[Math.floor(Math.random() * NICKNAME_NOUNS.length)];
-  return adj + noun;
 }
 
 // 随机 Emoji
@@ -427,19 +430,15 @@ document.addEventListener('click', (e) => {
 
 // ============ 7. Hero 折叠 ============
 function collapseHero() {
-  const hero = document.getElementById('heroSection');
-  const expandBtn = document.getElementById('heroExpandBtn');
-  hero.classList.add('collapsed');
-  expandBtn.style.display = 'block';
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.display = 'none';
   App.heroCollapsed = true;
   DB.set('hero_collapsed', true);
 }
 
 function expandHero() {
-  const hero = document.getElementById('heroSection');
-  const expandBtn = document.getElementById('heroExpandBtn');
-  hero.classList.remove('collapsed');
-  expandBtn.style.display = 'none';
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.display = '';
   App.heroCollapsed = false;
   DB.set('hero_collapsed', false);
 }
@@ -535,8 +534,8 @@ function renderPostList() {
   if (posts.length === 0) {
     container.innerHTML = '';
     emptyState.style.display = 'block';
-    const emptyTitle = emptyState.querySelector('.empty-title');
-    const emptyDesc = emptyState.querySelector('.empty-desc');
+    const emptyTitle = emptyState.querySelector('.empty-state-title');
+    const emptyDesc = emptyState.querySelector('.empty-state-text');
     if (emptyTitle) emptyTitle.textContent = App.searchQuery ? '没有找到匹配的内容' : '这片森林还安静着';
     if (emptyDesc) emptyDesc.textContent = App.searchQuery ? '试试其他关键词' : '种下第一棵树…';
     return;
@@ -846,15 +845,6 @@ function renderDetail(postId) {
   }
 
   // 情绪反应
-  const EMOTIONS = {
-    touched: { emoji: '🥴', label: '感动' },
-    empathy: { emoji: '🤗', label: '心疼' },
-    resonate: { emoji: '💪', label: '共鸣' },
-    agree: { emoji: '👏', label: '赞同' },
-    think: { emoji: '🤔', label: '深思' },
-    warm: { emoji: '☀️', label: '温暖' }
-  };
-
   let emotionsHtml = Object.entries(EMOTIONS).map(([key, e]) => {
     const count = post.emotions && post.emotions[key] ? post.emotions[key].length : 0;
     const isActive = identity && post.emotions && post.emotions[key] && post.emotions[key].includes(identity.id);
@@ -922,7 +912,7 @@ function renderDetail(postId) {
       <div class="comments-section">
         <h3 style="font-size:16px;margin-bottom:12px;color:var(--text-primary)">评论 (${post.comments ? post.comments.length : 0})</h3>
         <div class="comment-input-wrap">
-          <input type="text" class="comment-input" id="commentInput" placeholder="写下你的评论…" maxlength="500">
+          <input type="text" class="comment-input" id="commentInput" placeholder="写下你的评论…" maxlength="500" autocomplete="off" name="comment">
           <button class="comment-send" onclick="submitComment('${post.id}')">发送</button>
         </div>
         <div id="commentList">${commentsHtml}</div>
@@ -1610,7 +1600,7 @@ function renderLetterList() {
         <div class="letter-status ${isOpened ? 'opened' : 'sealed'}">
           ${isOpened ? '📬 已开封' : '🔒 封存中'}
         </div>
-        <div class="letter-preview">${escapeHtml(letter.content.slice(0, 20))}${letter.content.length > 20 ? '…' : ''}</div>
+        <div class="letter-preview">${isOpened ? (escapeHtml(letter.content.slice(0, 20)) + (letter.content.length > 20 ? '…' : '')) : '这封信正在沉睡中…'}</div>
         <div class="letter-meta">
           <div>写于 ${formatDateTime(letter.createdAt)}</div>
           ${isOpened ?
@@ -2160,7 +2150,7 @@ function initSampleData() {
       { id: 'c_4', content: '试试看！我总是注意力不集中，希望能有帮助', author: sampleIdentities[0], authorId: 'sample_1', createdAt: now - h * 6 }
     ], emotions: { agree: ['sample_5'], resonate: ['sample_1'] }, reports: [], createdAt: now - h * 8 },
     // 3. 安静的星辰 - "深夜的心事：30岁了还在迷茫" - 树洞/迷茫/心事 - 5赞3评 - 24小时前
-    { title: '深夜的心事：30岁了还在迷茫', content: '今天过完生日就30岁了。身边的同龄人有的结婚生子，有的买房买车，有的升职加薪。而我呢，还在做着一份不上不下的工作，存款少得可怜，感情也没有着落。有时候真的很焦虑，觉得自己的人生是不是走错了方向。但又不知道该往哪里走。', channel: 'treehole', mood: 'lost', tags: ['secret'], author: sampleIdentities[2], likes: 5, likedBy: ['sample_1','sample_2','sample_4','sample_5'], comments: [
+    { title: '深夜的心事：30岁了还在迷茫', content: '今天过完生日就30岁了。身边的同龄人有的结婚生子，有的买房买车，有的升职加薪。而我呢，还在做着一份不上不下的工作，存款少得可怜，感情也没有着落。有时候真的很焦虑，觉得自己的人生是不是走错了方向。但又不知道该往哪里走。', channel: 'treehole', mood: 'lost', tags: ['secret'], author: sampleIdentities[2], likes: 4, likedBy: ['sample_1','sample_2','sample_4','sample_5'], comments: [
       { id: 'c_5', content: '每个人都有自己的节奏，不用和别人比', author: sampleIdentities[0], authorId: 'sample_1', createdAt: now - h * 23 },
       { id: 'c_6', content: '30岁只是一个数字，人生还有很多可能', author: sampleIdentities[4], authorId: 'sample_5', createdAt: now - h * 22 },
       { id: 'c_7', content: '我32了也一样迷茫，你不是一个人', author: sampleIdentities[3], authorId: 'sample_4', createdAt: now - h * 20 }

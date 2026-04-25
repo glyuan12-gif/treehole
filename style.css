@@ -2,9 +2,6 @@
    树洞 - 匿名社交平台样式表
    ============================================ */
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Ma+Shan+Zheng&display=swap');
-
 /* ============================================
    1. CSS 变量体系 - 5套主题
    ============================================ */
@@ -15,10 +12,7 @@
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-full: 9999px;
-  /* --transition 只包含 timing function，不含 'all'，这是故意的。
-     使用 transition: var(--transition) 时浏览器不会隐式 transition 所有属性，
-     仅对已声明 transition 的属性生效。 */
-  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   --max-width: 720px;
   --shadow-sm: 0 1px 3px rgba(45,42,38,0.04);
@@ -296,7 +290,7 @@ select {
 
 .main-content {
   margin-top: 64px;
-  margin-bottom: 60px;
+  margin-bottom: 54px;
   padding: 16px;
   max-width: var(--max-width);
   margin-left: auto;
@@ -470,6 +464,7 @@ select {
   cursor: pointer;
   transition: var(--transition);
   scroll-margin-top: 70px;
+  position: relative;
 }
 
 .post-card:hover {
@@ -1478,6 +1473,13 @@ select {
 
 .letter-card.sealed {
   border-left: 3px solid var(--accent);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.letter-card.sealed:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
 }
 
 .letter-card.opened {
@@ -1500,8 +1502,8 @@ select {
 }
 
 .letter-status.opened {
-  background: #fff3e0;
-  color: #ff9800;
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
 .letter-preview {
@@ -1734,7 +1736,7 @@ select {
   height: 60px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
-  display: none; /* 默认隐藏，移动端显示 */
+  display: flex;
   align-items: center;
   justify-content: space-around;
   z-index: 100;
@@ -1835,17 +1837,20 @@ select {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   z-index: 200;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
+  visibility: hidden;
   opacity: 0;
-  transition: opacity 0.3s;
+  pointer-events: none;
+  transition: opacity 0.3s, visibility 0.3s;
 }
 
 .modal-overlay.active {
-  display: flex;
+  visibility: visible;
   opacity: 1;
+  pointer-events: auto;
 }
 
 .modal {
@@ -2411,11 +2416,6 @@ select {
    ============================================ */
 
 @media (max-width: 768px) {
-  /* 移动端显示底部Tab */
-  .tab-bar {
-    display: flex !important;
-  }
-
   /* 导航栏缩小 */
   .navbar {
     height: 56px;
@@ -3029,6 +3029,14 @@ select {
   color: var(--text-primary);
 }
 
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="starry"] input,
+[data-theme="starry"] textarea {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 [data-theme="dark"] .bg-grain,
 [data-theme="starry"] .bg-grain {
   opacity: 0.04;
@@ -3271,7 +3279,7 @@ select {
 
 /* 导航栏精简 */
 .navbar {
-  height: 50px !important;
+  height: 50px;
 }
 
 /* 主内容区精简 */
