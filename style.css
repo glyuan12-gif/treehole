@@ -311,7 +311,7 @@ select {
 
 .hero {
   text-align: center;
-  padding: 48px 20px 20px;
+  padding: 32px 20px 12px;
 }
 
 .hero-title {
@@ -319,10 +319,10 @@ select {
   font-size: 36px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   text-wrap: balance;
   letter-spacing: 0.08em;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .hero-title-bold {
@@ -339,9 +339,9 @@ select {
 }
 
 .hero-subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .hero-actions {
@@ -349,7 +349,7 @@ select {
   gap: 8px;
   justify-content: center;
   flex-wrap: nowrap;
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .hero-actions .btn-primary {
