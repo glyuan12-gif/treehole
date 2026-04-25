@@ -290,7 +290,7 @@ select {
 
 .main-content {
   margin-top: 64px;
-  margin-bottom: 54px;
+  margin-bottom: 56px;
   padding: 16px;
   max-width: var(--max-width);
   margin-left: auto;
@@ -1761,14 +1761,15 @@ select {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 56px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-around;
   z-index: 100;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -1px 8px rgba(0,0,0,0.04);
 }
 
 .tab-item {
@@ -2369,7 +2370,7 @@ select {
 
 .fab {
   position: fixed;
-  bottom: 76px;
+  bottom: 68px;
   right: 20px;
   width: 52px;
   height: 52px;
@@ -2452,9 +2453,8 @@ select {
   /* main-content 适配导航栏 + Tab栏 */
   .main-content {
     margin-top: 56px;
-    margin-bottom: 54px;
+    margin-bottom: 56px;
     padding: 12px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .hero-title {
@@ -3330,7 +3330,7 @@ select {
 
 /* 底部 Tab 栏精简 */
 .tab-bar {
-  height: 54px !important;
+  height: 50px;
 }
 
 .tab-item svg {
