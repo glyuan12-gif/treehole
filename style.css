@@ -325,6 +325,19 @@ select {
   line-height: 1.6;
 }
 
+.hero-title-bold {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hero-title-gradient {
+  font-weight: 700;
+  background: linear-gradient(135deg, #5b8c6e, #c9a84c, #e07c5a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .hero-subtitle {
   font-size: 14px;
   color: var(--text-muted);
@@ -333,8 +346,22 @@ select {
 
 .hero-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-actions .btn-primary {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.hero-actions .btn-ghost {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
 }
 
 .hero.collapsed {
@@ -1926,19 +1953,19 @@ select {
    ============================================ */
 
 .btn-primary {
-  padding: 10px 24px;
-  border-radius: 24px;
+  padding: 8px 20px;
+  border-radius: 20px;
   background: linear-gradient(135deg, var(--accent), var(--accent-warm));
   color: #ffffff;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(91,140,110,0.15), 0 0 0 1px rgba(91,140,110,0.06);
+  box-shadow: 0 2px 8px rgba(91,140,110,0.12);
 }
 
 .btn-primary::before {
@@ -1963,12 +1990,12 @@ select {
 }
 
 .btn-ghost {
-  padding: 10px 24px;
-  border-radius: 24px;
+  padding: 8px 20px;
+  border-radius: 20px;
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   cursor: pointer;
   transition: var(--transition);
