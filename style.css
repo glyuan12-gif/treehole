@@ -2765,7 +2765,6 @@ select {
 
 /* Logo 图标呼吸脉动 */
 .logo-icon {
-  filter: url(#logoGlow);
   animation: logoBreathe 4s ease-in-out infinite;
 }
 
