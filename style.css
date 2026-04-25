@@ -15,6 +15,9 @@
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-full: 9999px;
+  /* --transition 只包含 timing function，不含 'all'，这是故意的。
+     使用 transition: var(--transition) 时浏览器不会隐式 transition 所有属性，
+     仅对已声明 transition 的属性生效。 */
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   --max-width: 720px;
@@ -28,6 +31,7 @@
 /* 月光森林 (light) - 默认主题 */
 [data-theme="light"],
 :root {
+  color-scheme: light;
   --bg-primary: #f8f6f1;
   --bg-secondary: #fffefa;
   --bg-tertiary: #f0ece3;
@@ -46,6 +50,7 @@
 
 /* 暗夜森林 (dark) */
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg-primary: #1c1b18;
   --bg-secondary: #252420;
   --bg-tertiary: #302e28;
@@ -64,6 +69,7 @@
 
 /* 星空 (starry) */
 [data-theme="starry"] {
+  color-scheme: dark;
   --bg-primary: #0f0f1a;
   --bg-secondary: #181828;
   --bg-tertiary: #222238;
@@ -82,6 +88,7 @@
 
 /* 樱花 (sakura) */
 [data-theme="sakura"] {
+  color-scheme: light;
   --bg-primary: #fdf6f8;
   --bg-secondary: #fffafc;
   --bg-tertiary: #f8eef2;
@@ -100,6 +107,7 @@
 
 /* 暖阳 (sunny) */
 [data-theme="sunny"] {
+  color-scheme: light;
   --bg-primary: #faf8f2;
   --bg-secondary: #fffdf8;
   --bg-tertiary: #f3efe5;
@@ -136,11 +144,41 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 ::selection {
   background-color: var(--accent-light);
   color: var(--text-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 16px;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 a {
@@ -283,6 +321,7 @@ select {
   font-size: 28px;
   color: var(--text-primary);
   margin-bottom: 8px;
+  text-wrap: balance;
 }
 
 .hero-subtitle {
@@ -384,7 +423,7 @@ select {
   transition: var(--transition);
 }
 
-.search-input:focus {
+.search-input:focus-visible {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-light);
 }
@@ -423,6 +462,7 @@ select {
   border-left: 3px solid transparent;
   cursor: pointer;
   transition: var(--transition);
+  scroll-margin-top: 70px;
 }
 
 .post-card:hover {
@@ -494,6 +534,7 @@ select {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
+  font-variant-numeric: tabular-nums;
 }
 
 .role-badge {
@@ -705,8 +746,8 @@ select {
   resize: vertical;
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.form-input:focus-visible,
+.form-textarea:focus-visible {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-light);
 }
@@ -721,6 +762,7 @@ select {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
+  font-variant-numeric: tabular-nums;
 }
 
 .mood-selector {
@@ -835,6 +877,7 @@ select {
   margin-bottom: 12px;
   line-height: 1.4;
   font-family: var(--font-display);
+  text-wrap: balance;
 }
 
 .detail-content {
@@ -961,7 +1004,7 @@ select {
   transition: var(--transition);
 }
 
-.comment-input:focus {
+.comment-input:focus-visible {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-light);
 }
@@ -1124,6 +1167,7 @@ select {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
+  overscroll-behavior: contain;
 }
 
 .chat-bubble-wrap {
@@ -1187,7 +1231,7 @@ select {
   transition: var(--transition);
 }
 
-.chat-input:focus {
+.chat-input:focus-visible {
   border-color: var(--accent);
 }
 
@@ -1762,6 +1806,7 @@ select {
   padding: 24px;
   position: relative;
   animation: modalSlideIn 0.3s ease;
+  overscroll-behavior: contain;
 }
 
 @keyframes modalSlideIn {
@@ -1787,6 +1832,7 @@ select {
   font-weight: 700;
   color: var(--text-primary);
   font-family: var(--font-display);
+  text-wrap: balance;
 }
 
 .modal-close {
@@ -2745,6 +2791,12 @@ select {
 [data-theme="starry"] .bg-orb {
   opacity: 0.15;
   filter: blur(100px);
+}
+
+[data-theme="dark"] select,
+[data-theme="starry"] select {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .bg-grain,
