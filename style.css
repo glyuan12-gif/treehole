@@ -311,18 +311,18 @@ select {
 
 .hero {
   text-align: center;
-  padding: 40px 20px 24px;
+  padding: 48px 20px 20px;
 }
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 400;
+  font-size: 36px;
+  font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 8px;
   text-wrap: balance;
   letter-spacing: 0.08em;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .hero-title-bold {
@@ -346,21 +346,22 @@ select {
 
 .hero-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  margin-top: 20px;
 }
 
 .hero-actions .btn-primary {
-  padding: 8px 20px;
-  border-radius: 20px;
+  padding: 7px 18px;
+  border-radius: 18px;
   font-size: 13px;
   font-weight: 500;
 }
 
 .hero-actions .btn-ghost {
-  padding: 8px 20px;
-  border-radius: 20px;
+  padding: 7px 18px;
+  border-radius: 18px;
   font-size: 13px;
 }
 
