@@ -673,6 +673,26 @@ select {
   height: 16px;
 }
 
+.post-card.glow {
+  box-shadow: 0 0 20px rgba(91, 140, 110, 0.15), 0 0 40px rgba(91, 140, 110, 0.05);
+}
+
+.post-card.audit-pending {
+  opacity: 0.6;
+}
+
+.post-card.audit-pending::after {
+  content: '审核中';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 2px 8px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+}
+
 /* ============================================
    9. 空状态 (.empty-state)
    ============================================ */
@@ -811,6 +831,10 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.tag-option, .channel-option, .mood-option, .report-option, .style-option, .reaction-btn {
+  user-select: none;
 }
 
 .tag-option {

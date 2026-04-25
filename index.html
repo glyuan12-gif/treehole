@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f8f6f1">
-  <title>树洞 · 匿名社交</title>
+  <title>树洞 · 匿名分享</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -25,28 +25,21 @@
 <!-- 导航栏 -->
 <nav class="navbar">
   <button class="navbar-logo" onclick="navigate('home')" aria-label="树洞首页" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left">
-  <svg class="logo-icon" viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
-    <defs>
-      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:var(--accent)"/>
-        <stop offset="100%" style="stop-color:var(--accent-warm)"/>
-      </linearGradient>
-      <filter id="logoGlow">
-        <feGaussianBlur stdDeviation="1.5" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-    <!-- 树冠 - 三层叠加的圆形，模拟树冠的有机形态 -->
-    <circle class="logo-crown logo-crown-1" cx="20" cy="14" r="10" fill="url(#logoGrad)" opacity="0.7"/>
-    <circle class="logo-crown logo-crown-2" cx="13" cy="18" r="8" fill="url(#logoGrad)" opacity="0.85"/>
-    <circle class="logo-crown logo-crown-3" cx="27" cy="18" r="8" fill="url(#logoGrad)" opacity="0.85"/>
-    <!-- 树洞 - 中心暗色椭圆 -->
-    <ellipse class="logo-hole" cx="20" cy="17" rx="4.5" ry="5.5" fill="var(--bg-primary)" opacity="0.9"/>
-    <!-- 树干 -->
-    <rect x="18" y="24" width="4" height="10" rx="2" fill="url(#logoGrad)" opacity="0.6"/>
-    <!-- 树根 -->
-    <path d="M16 34 Q14 32 12 34" stroke="url(#logoGrad)" stroke-width="1.5" fill="none" opacity="0.4" stroke-linecap="round"/>
-    <path d="M24 34 Q26 32 28 34" stroke="url(#logoGrad)" stroke-width="1.5" fill="none" opacity="0.4" stroke-linecap="round"/>
+  <svg class="logo-icon" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true">
+    <!-- 月牙外圆 -->
+    <circle cx="32" cy="20" r="10" fill="currentColor" opacity="0.2"/>
+    <!-- 月牙遮罩 -->
+    <circle cx="36" cy="18" r="9" fill="var(--bg-primary)"/>
+    <!-- 树冠外层 -->
+    <path d="M32 58 C32 58 18 42 18 30 C18 22 24 16 32 16 C40 16 46 22 46 30 C46 42 32 58 32 58Z" fill="currentColor" opacity="0.15"/>
+    <!-- 树冠内层 -->
+    <path d="M32 52 C32 52 22 40 22 32 C22 26 26 22 32 22 C38 22 42 26 42 32 C42 40 32 52 32 52Z" fill="currentColor" opacity="0.25"/>
+    <!-- 树洞开口 -->
+    <path d="M28 44 Q32 48 36 44" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
+    <!-- 星星 -->
+    <circle cx="48" cy="14" r="1.2" fill="currentColor" opacity="0.4"/>
+    <circle cx="14" cy="24" r="0.8" fill="currentColor" opacity="0.3"/>
+    <circle cx="52" cy="28" r="0.6" fill="currentColor" opacity="0.25"/>
   </svg>
   <span class="logo-text">树洞</span>
   <span class="logo-dot"></span>
@@ -80,20 +73,21 @@
     <!-- Hero 区域 -->
     <div class="hero" id="heroSection">
       <h1 class="hero-title">
-        <svg class="hero-logo" viewBox="0 0 40 40" width="36" height="36" aria-hidden="true">
-          <defs>
-            <linearGradient id="heroLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:var(--accent)"/>
-              <stop offset="100%" style="stop-color:var(--accent-warm)"/>
-            </linearGradient>
-          </defs>
-          <circle class="logo-crown logo-crown-1" cx="20" cy="14" r="10" fill="url(#heroLogoGrad)" opacity="0.7"/>
-          <circle class="logo-crown logo-crown-2" cx="13" cy="18" r="8" fill="url(#heroLogoGrad)" opacity="0.85"/>
-          <circle class="logo-crown logo-crown-3" cx="27" cy="18" r="8" fill="url(#heroLogoGrad)" opacity="0.85"/>
-          <ellipse class="logo-hole" cx="20" cy="17" rx="4.5" ry="5.5" fill="var(--bg-primary)" opacity="0.9"/>
-          <rect x="18" y="24" width="4" height="10" rx="2" fill="url(#heroLogoGrad)" opacity="0.6"/>
-          <path d="M16 34 Q14 32 12 34" stroke="url(#heroLogoGrad)" stroke-width="1.5" fill="none" opacity="0.4" stroke-linecap="round"/>
-          <path d="M24 34 Q26 32 28 34" stroke="url(#heroLogoGrad)" stroke-width="1.5" fill="none" opacity="0.4" stroke-linecap="round"/>
+        <svg class="hero-logo" viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+          <!-- 月牙外圆 -->
+          <circle cx="32" cy="20" r="10" fill="currentColor" opacity="0.2"/>
+          <!-- 月牙遮罩 -->
+          <circle cx="36" cy="18" r="9" fill="var(--bg-primary)"/>
+          <!-- 树冠外层 -->
+          <path d="M32 58 C32 58 18 42 18 30 C18 22 24 16 32 16 C40 16 46 22 46 30 C46 42 32 58 32 58Z" fill="currentColor" opacity="0.15"/>
+          <!-- 树冠内层 -->
+          <path d="M32 52 C32 52 22 40 22 32 C22 26 26 22 32 22 C38 22 42 26 42 32 C42 40 32 52 32 52Z" fill="currentColor" opacity="0.25"/>
+          <!-- 树洞开口 -->
+          <path d="M28 44 Q32 48 36 44" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
+          <!-- 星星 -->
+          <circle cx="48" cy="14" r="1.2" fill="currentColor" opacity="0.4"/>
+          <circle cx="14" cy="24" r="0.8" fill="currentColor" opacity="0.3"/>
+          <circle cx="52" cy="28" r="0.6" fill="currentColor" opacity="0.25"/>
         </svg>
         在树洞里，做真实的自己
       </h1>
@@ -176,13 +170,13 @@
       <!-- 标题 -->
       <div class="form-group">
         <label class="form-label">标题</label>
-        <input type="text" class="form-input" id="postTitle" placeholder="给心事起个标题…" maxlength="100" autocomplete="off" name="title">
+        <input type="text" class="form-input" id="postTitle" placeholder="给帖子起个标题…" maxlength="100" autocomplete="off" name="title">
         <div class="char-count"><span id="titleCharCount">0</span>/100</div>
       </div>
       <!-- 内容 -->
       <div class="form-group">
         <label class="form-label">内容</label>
-        <textarea class="form-textarea" id="postContent" placeholder="说出你的故事…" maxlength="5000" name="content"></textarea>
+        <textarea class="form-textarea" id="postContent" placeholder="分享你的故事、经验或心事…" maxlength="5000" name="content"></textarea>
         <div class="char-count"><span id="contentCharCount">0</span>/5000</div>
       </div>
       <!-- 心情选择 -->
@@ -344,7 +338,7 @@
       <div class="form-group">
         <label class="form-label">昵称</label>
         <div style="display:flex;gap:8px">
-          <input type="text" class="form-input" id="nicknameInput" placeholder="输入昵称…" maxlength="20" style="flex:1" autocomplete="off" name="nickname" spellcheck="false">
+          <input type="text" class="form-input" id="nicknameInput" placeholder="留空则使用随机昵称" maxlength="12" style="flex:1" autocomplete="off" name="nickname" spellcheck="false">
           <button class="btn-ghost btn-sm" onclick="randomNickname()">🎲 随机</button>
         </div>
       </div>
@@ -355,7 +349,7 @@
           <button class="role-option" data-role="student">🎓 学生党</button>
           <button class="role-option" data-role="worker">💼 打工人</button>
           <button class="role-option" data-role="freelancer">🎨 自由职业</button>
-          <button class="role-option" data-role="traveler">🧭 神秘旅人</button>
+          <button class="role-option" data-role="other">🌟 神秘旅人</button>
         </div>
       </div>
       <!-- MBTI -->
@@ -564,7 +558,7 @@
     </div>
     <div class="form-group">
       <label class="form-label">内容</label>
-      <textarea class="form-textarea" id="diaryContent" placeholder="今天发生了什么…" maxlength="1000" name="diaryContent" style="min-height:120px"></textarea>
+      <textarea class="form-textarea" id="diaryContent" placeholder="今天想记录什么…" maxlength="1000" name="diaryContent" style="min-height:120px"></textarea>
       <div class="char-count"><span id="diaryCharCount">0</span>/1000</div>
     </div>
     <div class="form-group">
@@ -605,7 +599,7 @@
     </div>
     <div class="form-group">
       <label class="form-label">信件内容</label>
-      <textarea class="form-textarea" id="letterContent" placeholder="亲爱的未来的我…" maxlength="1000" name="letterContent" style="min-height:150px"></textarea>
+      <textarea class="form-textarea" id="letterContent" placeholder="你想对未来的自己说什么…" maxlength="1000" name="letterContent" style="min-height:150px"></textarea>
       <div class="char-count"><span id="letterCharCount">0</span>/1000</div>
     </div>
     <div class="form-group">
@@ -646,29 +640,30 @@
 <div class="modal-overlay" id="roleSelectModal">
   <div class="modal" style="max-width:440px">
     <div class="modal-header">
-      <h3 class="modal-title">欢迎来到树洞 🌳</h3>
+      <h3 class="modal-title">欢迎来到树洞</h3>
     </div>
-    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;text-align:center">选择你的角色，开始匿名之旅</p>
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:6px;text-align:center">选择一个角色标签，让大家更了解你的身份背景</p>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:20px;text-align:center">不会暴露真实身份，仅作为社区角色标识</p>
     <div class="role-cards" id="roleCards">
       <button class="role-card" onclick="selectRole('student')" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left">
         <div class="role-card-icon">🎓</div>
         <div class="role-card-name">学生党</div>
-        <div class="role-card-desc">校园生活，青春无限</div>
+        <div class="role-card-desc">在校大学生/研究生</div>
       </button>
       <button class="role-card" onclick="selectRole('worker')" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left">
         <div class="role-card-icon">💼</div>
         <div class="role-card-name">打工人</div>
-        <div class="role-card-desc">职场打拼，奋斗不止</div>
+        <div class="role-card-desc">职场上班族</div>
       </button>
       <button class="role-card" onclick="selectRole('freelancer')" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left">
         <div class="role-card-icon">🎨</div>
         <div class="role-card-name">自由职业</div>
-        <div class="role-card-desc">自由自在，随心而行</div>
+        <div class="role-card-desc">自由职业/创作者</div>
       </button>
-      <button class="role-card" onclick="selectRole('traveler')" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left">
-        <div class="role-card-icon">🧭</div>
+      <button class="role-card" onclick="selectRole('other')" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left">
+        <div class="role-card-icon">🌟</div>
         <div class="role-card-name">神秘旅人</div>
-        <div class="role-card-desc">行走在世界的边缘</div>
+        <div class="role-card-desc">不想被定义</div>
       </button>
     </div>
   </div>

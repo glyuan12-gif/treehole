@@ -59,7 +59,7 @@ const ROLES = {
   student: { name: '学生党', icon: '🎓' },
   worker: { name: '打工人', icon: '💼' },
   freelancer: { name: '自由职业', icon: '🎨' },
-  traveler: { name: '神秘旅人', icon: '🧭' }
+  other: { name: '神秘旅人', icon: '🌟' }
 };
 
 // 可选 Emoji 列表（72个）
@@ -121,14 +121,13 @@ const MBTI_COMPATIBILITY = {
   'ESFP': { 'ISFJ': 90, 'ISTJ': 85, 'ESFP': 70, 'ESTP': 75 }
 };
 
-// 敏感词库（基础）
-const SENSITIVE_WORDS = [
-  '赌博','色情','暴力','恐怖','毒品','枪支','炸弹','杀人','自杀',
-  '诈骗','传销','洗钱','走私','卖淫','嫖娼','强奸','猥亵',
-  '身份证号','银行卡号','密码泄露','信用卡',
-  '代开发票','假币','违禁品','管制刀具',
-  '人肉搜索','网络暴力','恶意造谣',
-  '赌博网站','色情网站','非法集资'
+// 敏感词正则（5类）
+const SENSITIVE_PATTERNS = [
+  { category: '暴力自残', regex: /杀|死|去死|自杀|自残|跳楼|割腕/ },
+  { category: '毒品', regex: /毒品|吸毒|贩毒|大麻|海洛因|冰毒/ },
+  { category: '赌博', regex: /赌博|赌场|下注|赌资/ },
+  { category: '诈骗', regex: /诈骗|骗钱|传销|洗钱/ },
+  { category: '色情', regex: /色情|裸照|约炮/ }
 ];
 
 // 随机昵称生成
@@ -536,6 +535,10 @@ function renderPostList() {
   if (posts.length === 0) {
     container.innerHTML = '';
     emptyState.style.display = 'block';
+    const emptyTitle = emptyState.querySelector('.empty-title');
+    const emptyDesc = emptyState.querySelector('.empty-desc');
+    if (emptyTitle) emptyTitle.textContent = App.searchQuery ? '没有找到匹配的内容' : '这片森林还安静着';
+    if (emptyDesc) emptyDesc.textContent = App.searchQuery ? '试试其他关键词' : '种下第一棵树…';
     return;
   }
 
@@ -549,6 +552,7 @@ function renderPostCard(post) {
   const identity = getIdentity();
   const isLiked = identity && post.likedBy && post.likedBy.includes(identity.id);
   const commentCount = post.comments ? post.comments.length : 0;
+  const isHot = (post.likes >= 5 || commentCount >= 5);
 
   let imagesHtml = '';
   if (post.images && post.images.length > 0) {
@@ -558,7 +562,7 @@ function renderPostCard(post) {
   }
 
   return `
-    <div class="post-card"${post.mood ? ' data-mood="'+post.mood+'"' : ''} onclick="navigate('detail', {postId: '${post.id}'})">
+    <div class="post-card${isHot ? ' glow' : ''}"${post.mood ? ' data-mood="'+post.mood+'"' : ''} onclick="navigate('detail', {postId: '${post.id}'})">
       <div class="post-card-header">
         ${renderAvatar(post.author)}
         <div class="post-author-info">
@@ -715,22 +719,27 @@ function removeImage() {
 function contentReview(title, content) {
   const fullText = (title + ' ' + content).toLowerCase();
 
-  // 敏感词检测
-  for (const word of SENSITIVE_WORDS) {
-    if (fullText.includes(word.toLowerCase())) {
-      return { pass: false, reason: '内容包含敏感词，请修改后重新发布' };
+  // 敏感词检测（正则）
+  for (const pattern of SENSITIVE_PATTERNS) {
+    if (pattern.regex.test(fullText)) {
+      return { pass: false, reason: '内容包含敏感词（' + pattern.category + '），请修改后重新发布' };
     }
   }
 
   // 内容过短
   if (content.trim().length < 5) {
-    return { pass: false, reason: '内容太短了，至少写 5 个字吧' };
+    return { pass: false, reason: '内容过短，请写得更详细一些' };
+  }
+
+  // 刷屏检测：同一字符重复10次以上
+  if (/(.)\1{9,}/.test(content)) {
+    return { pass: false, reason: '内容疑似刷屏，请写有意义的内容' };
   }
 
   // 特殊字符比例检测
   const specialChars = (fullText.match(/[^\w\u4e00-\u9fa5\s]/g) || []).length;
   if (specialChars / fullText.length > 0.5) {
-    return { pass: false, reason: '特殊字符过多，请正常输入内容' };
+    return { pass: false, reason: '内容包含过多特殊字符' };
   }
 
   return { pass: true };
@@ -738,6 +747,11 @@ function contentReview(title, content) {
 
 // 提交帖子
 function submitPost() {
+  // 防抖：1秒冷却
+  if (window._isSubmittingPost) return;
+  window._isSubmittingPost = true;
+  setTimeout(() => { window._isSubmittingPost = false; }, 1000);
+
   const title = document.getElementById('postTitle').value.trim();
   const content = document.getElementById('postContent').value.trim();
 
@@ -793,6 +807,11 @@ function submitPost() {
 
 // 取消发帖
 function cancelCreate() {
+  // 防抖：首次提示，3秒超时重置
+  if (window._cancelCreateConfirm) return;
+  window._cancelCreateConfirm = true;
+  setTimeout(() => { window._cancelCreateConfirm = false; }, 3000);
+
   const title = document.getElementById('postTitle').value.trim();
   const content = document.getElementById('postContent').value.trim();
   if (title || content) {
@@ -827,19 +846,19 @@ function renderDetail(postId) {
   }
 
   // 情绪反应
-  const emotionTypes = [
-    { key: 'touched', label: '感动', emoji: '🥹' },
-    { key: 'heartache', label: '心疼', emoji: '💔' },
-    { key: 'resonate', label: '共鸣', emoji: '🤝' },
-    { key: 'agree', label: '赞同', emoji: '👍' },
-    { key: 'think', label: '深思', emoji: '🤔' },
-    { key: 'warm', label: '温暖', emoji: '☀️' }
-  ];
+  const EMOTIONS = {
+    touched: { emoji: '🥴', label: '感动' },
+    empathy: { emoji: '🤗', label: '心疼' },
+    resonate: { emoji: '💪', label: '共鸣' },
+    agree: { emoji: '👏', label: '赞同' },
+    think: { emoji: '🤔', label: '深思' },
+    warm: { emoji: '☀️', label: '温暖' }
+  };
 
-  let emotionsHtml = emotionTypes.map(e => {
-    const count = post.emotions && post.emotions[e.key] ? post.emotions[e.key].length : 0;
-    const isActive = identity && post.emotions && post.emotions[e.key] && post.emotions[e.key].includes(identity.id);
-    return `<button class="emotion-btn ${isActive ? 'active' : ''}" onclick="toggleEmotion('${post.id}','${e.key}')">
+  let emotionsHtml = Object.entries(EMOTIONS).map(([key, e]) => {
+    const count = post.emotions && post.emotions[key] ? post.emotions[key].length : 0;
+    const isActive = identity && post.emotions && post.emotions[key] && post.emotions[key].includes(identity.id);
+    return `<button class="emotion-btn ${isActive ? 'active' : ''}" onclick="toggleEmotion('${post.id}','${key}')">
       ${e.emoji} ${e.label} <span class="emotion-count">${count || ''}</span>
     </button>`;
   }).join('');
@@ -903,7 +922,7 @@ function renderDetail(postId) {
       <div class="comments-section">
         <h3 style="font-size:16px;margin-bottom:12px;color:var(--text-primary)">评论 (${post.comments ? post.comments.length : 0})</h3>
         <div class="comment-input-wrap">
-          <input type="text" class="comment-input" id="commentInput" placeholder="写下你的想法…" maxlength="500">
+          <input type="text" class="comment-input" id="commentInput" placeholder="写下你的评论…" maxlength="500">
           <button class="comment-send" onclick="submitComment('${post.id}')">发送</button>
         </div>
         <div id="commentList">${commentsHtml}</div>
@@ -1000,9 +1019,9 @@ function submitReport() {
     createdAt: Date.now()
   });
 
-  // 举报超过3次自动隐藏
+  // 举报超过3次自动标记为 pending
   if (post.reports.length >= 3) {
-    post.hidden = true;
+    post.status = 'pending';
   }
 
   DB.set('posts', posts);
@@ -1024,6 +1043,11 @@ document.getElementById('messageInput').addEventListener('input', (e) => {
 });
 
 function sendPrivateMessage() {
+  // 防抖：1秒冷却
+  if (window._isSendingDm) return;
+  window._isSendingDm = true;
+  setTimeout(() => { window._isSendingDm = false; }, 1000);
+
   const content = document.getElementById('messageInput').value.trim();
   if (!content) {
     showToast('请输入消息内容', 'warning');
@@ -1111,7 +1135,7 @@ function renderConversationList() {
 
   container.innerHTML = conversations.map(conv => {
     const lastMsg = conv.messages.length ? conv.messages[conv.messages.length - 1] : null;
-    const preview = lastMsg ? (lastMsg.senderId === identity.id ? '我: ' : '') + lastMsg.content : '暂无消息';
+    const preview = lastMsg ? ((lastMsg.senderId === identity.id ? '我: ' : '') + lastMsg.content).substring(0, 30) : '暂无消息';
     const time = lastMsg ? formatTime(lastMsg.createdAt) : '';
     const isActive = App.currentChatId === conv.id;
 
@@ -1210,9 +1234,10 @@ function sendMessage() {
   const content = input.value.trim();
   if (!content) return;
 
-  // 防重复发送（1秒）
-  if (Date.now() - App.lastSendTime < 1000) return;
-  App.lastSendTime = Date.now();
+  // 防抖：1秒冷却
+  if (window._isSendingChat) return;
+  window._isSendingChat = true;
+  setTimeout(() => { window._isSendingChat = false; }, 1000);
 
   const identity = getIdentity();
   if (!identity) return;
@@ -1585,7 +1610,7 @@ function renderLetterList() {
         <div class="letter-status ${isOpened ? 'opened' : 'sealed'}">
           ${isOpened ? '📬 已开封' : '🔒 封存中'}
         </div>
-        <div class="letter-preview">${escapeHtml(letter.content.substring(0, 30))}${letter.content.length > 30 ? '...' : ''}</div>
+        <div class="letter-preview">${escapeHtml(letter.content.slice(0, 20))}${letter.content.length > 20 ? '…' : ''}</div>
         <div class="letter-meta">
           <div>写于 ${formatDateTime(letter.createdAt)}</div>
           ${isOpened ?
@@ -1897,110 +1922,58 @@ function applyThemePattern(themeId) {
 // ============ MBTI 测试 ============
 
 const MBTI_QUESTIONS = [
-  // E/I 维度 (6题)
-  { id: 1, dimension: 'EI', text: '在社交聚会上，你通常会...', options: [
-    { text: '主动和很多人聊天，享受热闹的氛围', value: 'E' },
-    { text: '找一两个熟悉的人安静聊天', value: 'I' }
+  { id: 1, dimension: 'EI', text: '周末到了，你更想…', options: [
+    { text: '🏠 在家看书追剧，享受独处时光', value: 'I' },
+    { text: '🎉 约朋友出去逛街吃饭', value: 'E' }
   ]},
-  { id: 2, dimension: 'EI', text: '周末你更倾向于...', options: [
-    { text: '约朋友出去聚会或参加活动', value: 'E' },
-    { text: '在家看书、追剧或独处充电', value: 'I' }
+  { id: 2, dimension: 'EI', text: '参加聚会，你通常会…', options: [
+    { text: '🤯 找个安静角落和一两人深聊', value: 'I' },
+    { text: '🎤 在人群中穿梭，认识新朋友', value: 'E' }
   ]},
-  { id: 3, dimension: 'EI', text: '在团队讨论中，你通常...', options: [
-    { text: '积极发言，分享自己的想法', value: 'E' },
-    { text: '先听别人说，想好了再发言', value: 'I' }
+  { id: 3, dimension: 'EI', text: '长时间独处后，你的感受…', options: [
+    { text: '🔋 充满了电，感觉很舒服', value: 'I' },
+    { text: '🧢 有点闷，想出去见见人', value: 'E' }
   ]},
-  { id: 4, dimension: 'EI', text: '长时间独处后，你会...', options: [
-    { text: '感到无聊，想要出去社交', value: 'E' },
-    { text: '觉得很充实，不想被打扰', value: 'I' }
+  { id: 4, dimension: 'SN', text: '做决定时，你更依赖…', options: [
+    { text: '🧠 直觉和灵感，跟着感觉走', value: 'N' },
+    { text: '📊 事实和数据，讲究实际依据', value: 'S' }
   ]},
-  { id: 5, dimension: 'EI', text: '认识新朋友时，你...', options: [
-    { text: '很容易和陌生人打成一片', value: 'E' },
-    { text: '需要时间才能打开心扉', value: 'I' }
+  { id: 5, dimension: 'SN', text: '看一部电影，你更在意…', options: [
+    { text: '🎬 画面、音效、剧情细节', value: 'S' },
+    { text: '💭 隐喻、主题、背后的深意', value: 'N' }
   ]},
-  { id: 6, dimension: 'EI', text: '你的能量来源主要是...', options: [
-    { text: '与他人的互动和交流', value: 'E' },
-    { text: '独处时的思考和反思', value: 'I' }
+  { id: 6, dimension: 'SN', text: '朋友吐槽，你第一反应…', options: [
+    { text: '🔍 仔细问清楚具体发生了什么', value: 'S' },
+    { text: '💭 联想背后的意义和可能性', value: 'N' }
   ]},
-  // S/N 维度 (6题)
-  { id: 7, dimension: 'SN', text: '你更关注...', options: [
-    { text: '具体的事实和细节', value: 'S' },
-    { text: '整体的概念和可能性', value: 'N' }
+  { id: 7, dimension: 'TF', text: '朋友遇到困难，你会…', options: [
+    { text: '🤗 先安慰情绪，陪伴最重要', value: 'F' },
+    { text: '💡 帮TA分析问题，给解决方案', value: 'T' }
   ]},
-  { id: 8, dimension: 'SN', text: '学习新东西时，你更喜欢...', options: [
-    { text: '按步骤来，注重实际操作', value: 'S' },
-    { text: '先理解原理，再灵活运用', value: 'N' }
+  { id: 8, dimension: 'TF', text: '团队艰难决定，你更看重…', options: [
+    { text: '⚖️ 公平和逻辑，即使不讨喜', value: 'T' },
+    { text: '🤝 每个人的感受，照顾所有人', value: 'F' }
   ]},
-  { id: 9, dimension: 'SN', text: '你更信赖...', options: [
-    { text: '自己的经验和过去的经历', value: 'S' },
-    { text: '自己的直觉和第六感', value: 'N' }
+  { id: 9, dimension: 'TF', text: '被批评时，你更常…', options: [
+    { text: '🤔 冷静想想对方说得对不对', value: 'T' },
+    { text: '😢 先觉得难过，然后才分析', value: 'F' }
   ]},
-  { id: 10, dimension: 'SN', text: '描述一件事时，你倾向于...', options: [
-    { text: '按时间顺序详细叙述', value: 'S' },
-    { text: '跳跃式地讲述重点和感受', value: 'N' }
+  { id: 10, dimension: 'JP', text: '旅行计划，你更倾向…', options: [
+    { text: '📋 提前规划好行程和住宿', value: 'J' },
+    { text: '🎒 说走就走，到了再应变', value: 'P' }
   ]},
-  { id: 11, dimension: 'SN', text: '面对问题时，你更倾向于...', options: [
-    { text: '参考已有的解决方案', value: 'S' },
-    { text: '寻找全新的解决方法', value: 'N' }
+  { id: 11, dimension: 'JP', text: '你的书桌/房间通常…', options: [
+    { text: '🧹 整整齐齐，东西有固定位置', value: 'J' },
+    { text: '🌀 有点乱但我知道东西在哪', value: 'P' }
   ]},
-  { id: 12, dimension: 'SN', text: '你更欣赏的人是...', options: [
-    { text: '脚踏实地、注重实际的人', value: 'S' },
-    { text: '充满想象力、有远见的人', value: 'N' }
-  ]},
-  // T/F 维度 (6题)
-  { id: 13, dimension: 'TF', text: '做决定时，你更看重...', options: [
-    { text: '逻辑分析和客观事实', value: 'T' },
-    { text: '个人感受和他人的影响', value: 'F' }
-  ]},
-  { id: 14, dimension: 'TF', text: '朋友遇到困难来找你，你会...', options: [
-    { text: '帮他分析问题，给出解决方案', value: 'T' },
-    { text: '先安慰他的情绪，让他感到被理解', value: 'F' }
-  ]},
-  { id: 15, dimension: 'TF', text: '在争论中，你更倾向于...', options: [
-    { text: '坚持自己认为正确的观点', value: 'T' },
-    { text: '为了和谐而做出让步', value: 'F' }
-  ]},
-  { id: 16, dimension: 'TF', text: '评价一个人时，你更看重...', options: [
-    { text: '他的能力和成就', value: 'T' },
-    { text: '他的品格和为人', value: 'F' }
-  ]},
-  { id: 17, dimension: 'TF', text: '你觉得更重要的是...', options: [
-    { text: '公平和正义', value: 'T' },
-    { text: '善良和同情', value: 'F' }
-  ]},
-  { id: 18, dimension: 'TF', text: '收到批评时，你通常会...', options: [
-    { text: '理性分析批评是否合理', value: 'T' },
-    { text: '先感到受伤，然后慢慢消化', value: 'F' }
-  ]},
-  // J/P 维度 (6题)
-  { id: 19, dimension: 'JP', text: '你的日常生活更像是...', options: [
-    { text: '有计划、有条理的', value: 'J' },
-    { text: '随性、灵活的', value: 'P' }
-  ]},
-  { id: 20, dimension: 'JP', text: '面对截止日期，你通常...', options: [
-    { text: '提前完成，留出缓冲时间', value: 'J' },
-    { text: '在最后期限前冲刺完成', value: 'P' }
-  ]},
-  { id: 21, dimension: 'JP', text: '旅行时，你更喜欢...', options: [
-    { text: '提前规划好详细的行程', value: 'J' },
-    { text: '到了目的地再随机应变', value: 'P' }
-  ]},
-  { id: 22, dimension: 'JP', text: '你的工作空间通常是...', options: [
-    { text: '整洁有序，东西都有固定位置', value: 'J' },
-    { text: '有点乱但自己能找到东西', value: 'P' }
-  ]},
-  { id: 23, dimension: 'JP', text: '制定规则时，你倾向于...', options: [
-    { text: '严格遵守既定的规则和流程', value: 'J' },
-    { text: '觉得规则可以灵活变通', value: 'P' }
-  ]},
-  { id: 24, dimension: 'JP', text: '对于未来，你...', options: [
-    { text: '喜欢有明确的目标和计划', value: 'J' },
-    { text: '保持开放，看看会有什么机会', value: 'P' }
+  { id: 12, dimension: 'JP', text: '面对截止日期，你通常…', options: [
+    { text: '📅 提前完成，留出缓冲时间', value: 'J' },
+    { text: '⏰ 最后一刻爆发，deadline是第一生产力', value: 'P' }
   ]}
 ];
 
 function openMBTITest() {
-  App.mbtiTestAnswers = new Array(24).fill(null);
+  App.mbtiTestAnswers = new Array(12).fill(null);
   App.mbtiTestStep = 0;
   renderMBTIStep();
   openModal('mbtiModal');
@@ -2163,116 +2136,80 @@ function initSampleData() {
   // 如果已有帖子数据，不覆盖
   if (DB.get('posts', []).length > 0) return;
 
+  const now = Date.now();
+  const h = 3600000;
+  const d = 86400000;
+
   const sampleIdentities = [
-    { id: 'sample1', nickname: '温柔的猫咪', role: 'student', mbti: 'INFP', avatarStyle: 'emoji', emoji: '🐱', bgColor: '#5b8c6e', createdAt: Date.now() - 86400000 * 30 },
-    { id: 'sample2', nickname: '酷酷的星星', role: 'worker', mbti: 'INTJ', avatarStyle: 'emoji', emoji: '⭐', bgColor: '#7b8cde', createdAt: Date.now() - 86400000 * 25 },
-    { id: 'sample3', nickname: '快乐的小熊', role: 'freelancer', mbti: 'ENFP', avatarStyle: 'emoji', emoji: '🐻', bgColor: '#d4944a', createdAt: Date.now() - 86400000 * 20 },
-    { id: 'sample4', nickname: '安静的月亮', role: 'student', mbti: 'INFJ', avatarStyle: 'emoji', emoji: '🌙', bgColor: '#d4728a', createdAt: Date.now() - 86400000 * 15 },
-    { id: 'sample5', nickname: '勇敢的微风', role: 'worker', mbti: 'ENTJ', avatarStyle: 'emoji', emoji: '🍃', bgColor: '#6fa882', createdAt: Date.now() - 86400000 * 10 },
-    { id: 'sample6', nickname: '神秘的云朵', role: 'traveler', mbti: 'INTP', avatarStyle: 'emoji', emoji: '☁️', bgColor: '#c495d4', createdAt: Date.now() - 86400000 * 5 },
-    { id: 'sample7', nickname: '文艺的晚风', role: 'student', mbti: 'ISFP', avatarStyle: 'emoji', emoji: '🌸', bgColor: '#e67e22', createdAt: Date.now() - 86400000 * 3 },
-    { id: 'sample8', nickname: '孤独的露珠', role: 'worker', mbti: 'ISTJ', avatarStyle: 'emoji', emoji: '💧', bgColor: '#3498db', createdAt: Date.now() - 86400000 * 2 }
+    { id: 'sample_1', nickname: '温柔的猫咪', role: 'student', mbti: 'INFP', avatarStyle: 'emoji', emoji: '🐱', bgColor: '#e07c5a', createdAt: now - d * 30 },
+    { id: 'sample_2', nickname: '自由的旅人', role: 'worker', mbti: 'ENTJ', avatarStyle: 'emoji', emoji: '🌍', bgColor: '#5b8cc9', createdAt: now - d * 25 },
+    { id: 'sample_3', nickname: '安静的星辰', role: 'freelancer', mbti: 'INFJ', avatarStyle: 'emoji', emoji: '✨', bgColor: '#9b6bb0', createdAt: now - d * 20 },
+    { id: 'sample_4', nickname: '浪漫的月光', role: 'student', mbti: 'ENFP', avatarStyle: 'emoji', emoji: '🌙', bgColor: '#c9a84c', createdAt: now - d * 15 },
+    { id: 'sample_5', nickname: '勇敢的海鸥', role: 'worker', mbti: 'ISTJ', avatarStyle: 'emoji', emoji: '🕊️', bgColor: '#4a9e7d', createdAt: now - d * 10 }
   ];
 
   const samplePosts = [
-    { title: '考研倒计时30天，好焦虑', content: '还有30天就要考研了，可是感觉什么都没准备好。每天在图书馆从早到晚，但效率越来越低。室友们都找到了工作或者保了研，只有我还在苦哈哈地备考。有时候真的会怀疑自己的选择是不是对的...', channel: 'campus', mood: 'anxious', tags: ['secret', 'complain'], author: sampleIdentities[0], likes: 23, likedBy: ['sample2','sample3','sample4'], comments: [
-      { id: 'c1', content: '加油！最后一个月坚持住，你一定可以的！', author: sampleIdentities[2], authorId: 'sample3', createdAt: Date.now() - 86400000 * 28 },
-      { id: 'c2', content: '我去年也是这样过来的，最后结果比想象的好，相信自己', author: sampleIdentities[3], authorId: 'sample4', createdAt: Date.now() - 86400000 * 27 },
-      { id: 'c3', content: '焦虑是正常的，说明你在乎。适当放松也很重要', author: sampleIdentities[1], authorId: 'sample2', createdAt: Date.now() - 86400000 * 26 }
-    ], emotions: { touched: ['sample3','sample4'], resonate: ['sample2'], warm: ['sample1'] }, reports: [], createdAt: Date.now() - 86400000 * 29 },
-    { title: '入职三个月了，终于适应了', content: '从校园到职场的转变真的不容易。刚开始的时候每天都在犯错，被领导说了好几次。但现在慢慢上手了，也交到了几个不错的同事朋友。虽然工资不高，但至少能养活自己了。分享一些职场小经验给大家。', channel: 'work', mood: 'calm', tags: ['experience', 'share'], author: sampleIdentities[1], likes: 45, likedBy: ['sample1','sample3','sample5','sample6'], comments: [
-      { id: 'c4', content: '恭喜适应了！能分享一下具体的经验吗？', author: sampleIdentities[4], authorId: 'sample5', createdAt: Date.now() - 86400000 * 20 }
-    ], emotions: { agree: ['sample5'], warm: ['sample1'] }, reports: [], createdAt: Date.now() - 86400000 * 24 },
-    { title: '今天在路边看到一只流浪猫', content: '下班回家的路上，看到一只小橘猫蹲在路边。它看到我过来，就蹭了蹭我的腿。我好想带它回家，但是出租屋不让养宠物。给它买了根火腿肠，看着它吃完才走。希望它能找到一个好人家。', channel: 'life', mood: 'moved', tags: ['daily', 'share'], author: sampleIdentities[2], likes: 67, likedBy: ['sample1','sample2','sample4','sample5','sample6','sample7'], comments: [
-      { id: 'c5', content: '好有爱！可以联系当地的流浪动物救助站', author: sampleIdentities[6], authorId: 'sample7', createdAt: Date.now() - 86400000 * 18 },
-      { id: 'c6', content: '我也好喜欢猫猫，可是条件不允许', author: sampleIdentities[0], authorId: 'sample1', createdAt: Date.now() - 86400000 * 17 }
-    ], emotions: { touched: ['sample1','sample6','sample7'], warm: ['sample2','sample4'], heartache: ['sample3'] }, reports: [], createdAt: Date.now() - 86400000 * 19 },
-    { title: '暗恋的人今天跟我说话了', content: '他/她今天主动来问我借笔记，我的心跳得好快。虽然只是一个很普通的对话，但我开心了一整天。不知道该不该表白，怕被拒绝之后连朋友都做不了。有没有人能给我一些建议？', channel: 'emotion', mood: 'expect', tags: ['secret', 'help'], author: sampleIdentities[3], likes: 89, likedBy: ['sample1','sample2','sample3','sample5','sample6','sample7','sample8'], comments: [
-      { id: 'c7', content: '先从朋友做起，慢慢了解对方，不着急', author: sampleIdentities[2], authorId: 'sample3', createdAt: Date.now() - 86400000 * 14 },
-      { id: 'c8', content: '勇敢一点！就算被拒绝也不会后悔', author: sampleIdentities[4], authorId: 'sample5', createdAt: Date.now() - 86400000 * 13 },
-      { id: 'c9', content: '我当年也是这样，后来鼓起勇气表白了，现在在一起三年了', author: sampleIdentities[5], authorId: 'sample6', createdAt: Date.now() - 86400000 * 12 },
-      { id: 'c10', content: '加油！喜欢就要说出来呀', author: sampleIdentities[6], authorId: 'sample7', createdAt: Date.now() - 86400000 * 11 }
-    ], emotions: { touched: ['sample2','sample6'], resonate: ['sample1','sample3','sample7'], warm: ['sample4','sample5'], agree: ['sample8'] }, reports: [], createdAt: Date.now() - 86400000 * 15 },
-    { title: '自由职业一年了，说说真实感受', content: '辞职做自由职业已经一年了。好处是时间自由，不用通勤，可以在家办公。坏处是收入不稳定，有时候一个月赚很多，有时候几乎没收入。而且很孤独，没有同事可以聊天。总的来说，适合自律的人，不适合我这种拖延症患者。', channel: 'work', mood: 'lost', tags: ['experience', 'share'], author: sampleIdentities[2], likes: 34, likedBy: ['sample1','sample4','sample7'], comments: [
-      { id: 'c11', content: '深有同感，自由职业的孤独感真的很难受', author: sampleIdentities[3], authorId: 'sample4', createdAt: Date.now() - 86400000 * 10 }
-    ], emotions: { resonate: ['sample4','sample7'], agree: ['sample1'] }, reports: [], createdAt: Date.now() - 86400000 * 11 },
-    { title: '终于把毕业论文写完了！', content: '历时三个月，改了八遍，终于把毕业论文写完了！虽然可能还有很多问题，但至少交出去了。感觉整个人都轻松了。今晚要好好犒劳自己，吃顿好的！', channel: 'campus', mood: 'happy', tags: ['daily', 'share'], author: sampleIdentities[4], likes: 56, likedBy: ['sample1','sample2','sample3','sample6','sample7','sample8'], comments: [
-      { id: 'c12', content: '恭喜恭喜！答辩加油！', author: sampleIdentities[0], authorId: 'sample1', createdAt: Date.now() - 86400000 * 8 },
-      { id: 'c13', content: '太棒了！辛苦了这么久终于完成了', author: sampleIdentities[5], authorId: 'sample6', createdAt: Date.now() - 86400000 * 7 }
-    ], emotions: { warm: ['sample1','sample2'], agree: ['sample3','sample6'] }, reports: [], createdAt: Date.now() - 86400000 * 9 },
-    { title: '深夜emo，随便说说', content: '凌晨两点还睡不着。最近压力很大，工作上的事情一团糟，感情上也出了问题。感觉自己什么都做不好，好累。不知道有没有人和我一样，白天假装没事，晚上一个人崩溃。', channel: 'treehole', mood: 'sad', tags: ['secret', 'complain'], author: sampleIdentities[5], likes: 112, likedBy: ['sample1','sample2','sample3','sample4','sample6','sample7','sample8'], comments: [
-      { id: 'c14', content: '抱抱你，你不是一个人，很多人都经历过', author: sampleIdentities[0], authorId: 'sample1', createdAt: Date.now() - 86400000 * 6 },
-      { id: 'c15', content: '允许自己脆弱，不需要一直坚强', author: sampleIdentities[3], authorId: 'sample4', createdAt: Date.now() - 86400000 * 5 },
-      { id: 'c16', content: '如果需要倾诉，可以私信我，我一直都在', author: sampleIdentities[6], authorId: 'sample7', createdAt: Date.now() - 86400000 * 4 },
-      { id: 'c17', content: '一切都会好起来的，相信我', author: sampleIdentities[2], authorId: 'sample3', createdAt: Date.now() - 86400000 * 3 }
-    ], emotions: { touched: ['sample1','sample4','sample7'], heartache: ['sample2','sample3','sample6'], resonate: ['sample8'], warm: ['sample4','sample6'] }, reports: [], createdAt: Date.now() - 86400000 * 7 },
-    { title: '推荐几部治愈系电影', content: '最近看了几部特别治愈的电影，分享给大家：1.《小森林》- 关于回到乡村生活的故事，画面很美 2.《海街日记》- 是枝裕和的作品，温暖又治愈 3.《心灵奇旅》- 皮克斯的，关于找到人生的意义 4.《龙猫》- 永远的经典，看多少遍都不会腻。心情不好的时候看看这些电影，真的会好很多。', channel: 'life', mood: 'happy', tags: ['share', 'experience'], author: sampleIdentities[6], likes: 78, likedBy: ['sample1','sample2','sample3','sample4','sample5','sample7'], comments: [
-      { id: 'c18', content: '《小森林》真的太治愈了！', author: sampleIdentities[0], authorId: 'sample1', createdAt: Date.now() - 86400000 * 4 },
-      { id: 'c19', content: '加一个《千与千寻》！', author: sampleIdentities[5], authorId: 'sample6', createdAt: Date.now() - 86400000 * 3 }
-    ], emotions: { agree: ['sample1','sample2','sample5'], warm: ['sample3','sample4'] }, reports: [], createdAt: Date.now() - 86400000 * 5 },
-    { title: '今天被领导夸了', content: '做了一个方案被领导在会议上表扬了！虽然只是一个小小的肯定，但对我来说意义很大。入职以来一直在怀疑自己的能力，今天终于有了点信心。继续加油！', channel: 'work', mood: 'happy', tags: ['daily', 'share'], author: sampleIdentities[7], likes: 29, likedBy: ['sample1','sample2','sample4','sample5'], comments: [
-      { id: 'c20', content: '太棒了！继续加油！', author: sampleIdentities[4], authorId: 'sample5', createdAt: Date.now() - 86400000 * 2 }
-    ], emotions: { warm: ['sample1','sample4'], agree: ['sample2','sample5'] }, reports: [], createdAt: Date.now() - 86400000 * 3 },
-    { title: '一个人旅行的第五天', content: '辞职后决定一个人出来旅行。今天是第五天，到了大理。洱海真的很美，坐在海边发了一下午的呆。虽然一个人有时候会感到孤独，但更多的是自由和放松。不用管工作消息，不用应付社交，就做自己想做的事。', channel: 'life', mood: 'calm', tags: ['daily', 'share'], author: sampleIdentities[5], likes: 95, likedBy: ['sample1','sample2','sample3','sample4','sample6','sample7','sample8'], comments: [
-      { id: 'c21', content: '好羡慕！一个人旅行真的很酷', author: sampleIdentities[6], authorId: 'sample7', createdAt: Date.now() - 86400000 * 2 },
-      { id: 'c22', content: '大理很美，祝你旅途愉快', author: sampleIdentities[0], authorId: 'sample1', createdAt: Date.now() - 86400000 }
-    ], emotions: { resonate: ['sample1','sample6','sample7'], warm: ['sample2','sample3','sample4'], agree: ['sample8'] }, reports: [], createdAt: Date.now() - 86400000 * 2 },
-    { title: '关于MBTI的一些想法', content: '做了MBTI测试发现自己是INFP，看了描述觉得好准。但后来想了一下，是不是因为我们看了描述之后，才觉得自己是这样的？就像星座一样，巴纳姆效应。不过MBTI至少能帮我们更好地了解自己，也不全是坏事。大家觉得呢？', channel: 'treehole', mood: 'lost', tags: ['daily', 'share'], author: sampleIdentities[3], likes: 41, likedBy: ['sample1','sample2','sample5','sample6'], comments: [
-      { id: 'c23', content: '我觉得有一定参考价值，但不能完全定义一个人', author: sampleIdentities[5], authorId: 'sample6', createdAt: Date.now() - 86400000 }
-    ], emotions: { think: ['sample1','sample2','sample5'], agree: ['sample6'] }, reports: [], createdAt: Date.now() - 86400000 },
-    { title: '学做饭一个月了', content: '一个月前开始学做饭，从煮泡面都不会到现在能做几道简单的菜了。虽然味道一般，但看着自己做的菜还是很有成就感。今天尝试做了番茄炒蛋和蒜蓉西兰花，居然还不错！发出来纪念一下。', channel: 'life', mood: 'happy', tags: ['daily', 'experience'], author: sampleIdentities[7], likes: 52, likedBy: ['sample1','sample2','sample3','sample4','sample6'], comments: [
-      { id: 'c24', content: '厉害！我到现在还只会煮泡面', author: sampleIdentities[0], authorId: 'sample1', createdAt: Date.now() - 86400000 * 3 },
-      { id: 'c25', content: '番茄炒蛋是入门必修课，加油！', author: sampleIdentities[4], authorId: 'sample5', createdAt: Date.now() - 86400000 * 2 }
-    ], emotions: { warm: ['sample1','sample2'], agree: ['sample3','sample4'] }, reports: [], createdAt: Date.now() - 86400000 * 4 },
-    { title: '和好朋友吵架了', content: '因为一件小事和最好的朋友吵了一架，现在冷战三天了。其实我知道自己也有不对的地方，但就是拉不下脸去道歉。我们认识十年了，从来没有吵过这么久。好想回到以前的样子，但又不知道该怎么开口。', channel: 'emotion', mood: 'sad', tags: ['secret', 'help'], author: sampleIdentities[6], likes: 38, likedBy: ['sample1','sample3','sample4','sample7'], comments: [
-      { id: 'c26', content: '十年的友情不会因为一次吵架就结束的，勇敢一点去道歉吧', author: sampleIdentities[3], authorId: 'sample4', createdAt: Date.now() - 86400000 * 2 },
-      { id: 'c27', content: '可以发条消息说想他了，不用太正式', author: sampleIdentities[0], authorId: 'sample1', createdAt: Date.now() - 86400000 }
-    ], emotions: { resonate: ['sample1','sample4'], warm: ['sample3','sample7'], heartache: ['sample6'] }, reports: [], createdAt: Date.now() - 86400000 * 2 },
-    { title: '今天收到了offer！', content: '面试了五家公司，终于收到了心仪的offer！虽然薪资没有预期那么高，但是公司氛围很好，做的事情也是自己喜欢的。从秋招到现在，投了上百份简历，被拒了无数次，终于有了结果。想告诉正在找工作的朋友们，不要放弃！', channel: 'campus', mood: 'happy', tags: ['daily', 'experience'], author: sampleIdentities[0], likes: 88, likedBy: ['sample1','sample2','sample3','sample4','sample5','sample6','sample7','sample8'], comments: [
-      { id: 'c28', content: '恭喜恭喜！太替你开心了！', author: sampleIdentities[2], authorId: 'sample3', createdAt: Date.now() - 86400000 },
-      { id: 'c29', content: '我也在找工作，看到你的分享有了动力', author: sampleIdentities[7], authorId: 'sample8', createdAt: Date.now() - 86400000 },
-      { id: 'c30', content: '好棒！第一份工作加油！', author: sampleIdentities[4], authorId: 'sample5', createdAt: Date.now() - 86400000 }
-    ], emotions: { warm: ['sample2','sample3','sample4','sample5','sample6','sample7'], agree: ['sample1','sample8'] }, reports: [], createdAt: Date.now() - 86400000 },
-    { title: '给三年后的自己写了一封信', content: '不知道三年后的你在做什么，是不是已经实现了现在的梦想。希望你依然保持初心，不要被生活磨平了棱角。如果遇到了困难，请记住现在的你有多么勇敢。无论如何，都要好好照顾自己。', channel: 'treehole', mood: 'expect', tags: ['secret', 'share'], author: sampleIdentities[4], likes: 63, likedBy: ['sample1','sample2','sample3','sample5','sample6','sample7'], comments: [
-      { id: 'c31', content: '好感动，我也想给未来的自己写信', author: sampleIdentities[3], authorId: 'sample4', createdAt: Date.now() - 86400000 }
-    ], emotions: { touched: ['sample1','sample2','sample3','sample6','sample7'], warm: ['sample5'], resonate: ['sample4'] }, reports: [], createdAt: Date.now() - 86400000 * 6 },
-    { title: '失眠的第N个夜晚', content: '又失眠了。躺在床上翻来覆去就是睡不着，脑子里全是乱七八糟的想法。工作上的压力、生活中的琐事、对未来的迷茫...有时候真的很累，想找个地方好好哭一场。但是明天还要早起上班，只能逼自己闭上眼睛。', channel: 'treehole', mood: 'anxious', tags: ['secret', 'complain'], author: sampleIdentities[7], likes: 76, likedBy: ['sample1','sample2','sample3','sample4','sample5','sample6','sample7'], comments: [
-      { id: 'c32', content: '试试睡前冥想或者听白噪音，对我很有用', author: sampleIdentities[5], authorId: 'sample6', createdAt: Date.now() - 86400000 * 3 },
-      { id: 'c33', content: '失眠的时候可以起来写写日记，把脑子里的东西倒出来', author: sampleIdentities[3], authorId: 'sample4', createdAt: Date.now() - 86400000 * 2 }
-    ], emotions: { resonate: ['sample1','sample2','sample3','sample6'], heartache: ['sample4','sample7'], warm: ['sample5'] }, reports: [], createdAt: Date.now() - 86400000 * 4 },
-    { title: '学会了骑自行车！', content: '作为一个二十多岁还不会骑自行车的人，今天终于学会了！虽然摔了好几次，膝盖都磕破了，但是当终于能稳稳地骑起来的那一刻，真的太开心了。原来什么时候开始都不晚，只要你想学。', channel: 'life', mood: 'happy', tags: ['daily', 'share'], author: sampleIdentities[6], likes: 44, likedBy: ['sample1','sample2','sample3','sample4','sample5'], comments: [
-      { id: 'c34', content: '哈哈哈太可爱了，恭喜！', author: sampleIdentities[2], authorId: 'sample3', createdAt: Date.now() - 86400000 }
-    ], emotions: { warm: ['sample1','sample2','sample3','sample4'], agree: ['sample5'] }, reports: [], createdAt: Date.now() - 86400000 * 3 },
-    { title: '被裁员了', content: '今天突然被通知裁员了，完全没有心理准备。公司说是因为业务调整，整个部门都被裁了。拿着赔偿金走出公司大门的那一刻，不知道该哭还是该笑。投了那么多简历，好不容易找到的工作，就这样没了。接下来该怎么办呢...', channel: 'work', mood: 'sad', tags: ['complain', 'help'], author: sampleIdentities[7], likes: 56, likedBy: ['sample1','sample2','sample3','sample4','sample5','sample6'], comments: [
-      { id: 'c35', content: '抱抱你，这不是你的问题。趁这个机会好好休息一下，然后重新出发', author: sampleIdentities[4], authorId: 'sample5', createdAt: Date.now() - 86400000 },
-      { id: 'c36', content: '有赔偿金的话可以先休息一段时间，调整好状态再找工作', author: sampleIdentities[1], authorId: 'sample2', createdAt: Date.now() - 86400000 }
-    ], emotions: { heartache: ['sample1','sample2','sample3','sample4'], warm: ['sample5','sample6'], resonate: ['sample7'] }, reports: [], createdAt: Date.now() - 86400000 }
+    // 1. 温柔的猫咪 - "今天在公园看到一只超可爱的柴犬" - 生活/开心/日常 - 3赞2评 - 2小时前
+    { title: '今天在公园看到一只超可爱的柴犬', content: '今天在公园散步的时候，看到一只超可爱的柴犬！毛茸茸的，屁股一扭一扭地跑来跑去，还冲我摇尾巴。主人说它叫"团子"，两岁半了。忍不住蹲下来摸了好久，感觉一天的疲惫都被治愈了。养狗的人真的好幸福啊！', channel: 'life', mood: 'happy', tags: ['daily'], author: sampleIdentities[0], likes: 3, likedBy: ['sample_2','sample_3','sample_5'], comments: [
+      { id: 'c_1', content: '柴犬真的太可爱了！我也好想养一只', author: sampleIdentities[3], authorId: 'sample_4', createdAt: now - h * 1.5 },
+      { id: 'c_2', content: '团子这个名字好适合柴犬哈哈哈', author: sampleIdentities[1], authorId: 'sample_2', createdAt: now - h * 1 }
+    ], emotions: { touched: ['sample_4'], warm: ['sample_2','sample_3'] }, reports: [], createdAt: now - h * 2 },
+    // 2. 自由的旅人 - "分享一个提高效率的方法：番茄工作法" - 职场/期待/经验,分享 - 4赞2评 - 8小时前
+    { title: '分享一个提高效率的方法：番茄工作法', content: '最近工作压力很大，总是拖延。朋友推荐了番茄工作法，试了一周真的有效！方法很简单：专注工作25分钟，休息5分钟，每4个番茄钟休息15-30分钟。关键是把大任务拆成小步骤，一个番茄钟只做一件事。推荐给同样有拖延症的朋友们！', channel: 'work', mood: 'expect', tags: ['experience', 'share'], author: sampleIdentities[1], likes: 4, likedBy: ['sample_1','sample_3','sample_4','sample_5'], comments: [
+      { id: 'c_3', content: '番茄工作法确实好用，我用了半年了', author: sampleIdentities[4], authorId: 'sample_5', createdAt: now - h * 7 },
+      { id: 'c_4', content: '试试看！我总是注意力不集中，希望能有帮助', author: sampleIdentities[0], authorId: 'sample_1', createdAt: now - h * 6 }
+    ], emotions: { agree: ['sample_5'], resonate: ['sample_1'] }, reports: [], createdAt: now - h * 8 },
+    // 3. 安静的星辰 - "深夜的心事：30岁了还在迷茫" - 树洞/迷茫/心事 - 5赞3评 - 24小时前
+    { title: '深夜的心事：30岁了还在迷茫', content: '今天过完生日就30岁了。身边的同龄人有的结婚生子，有的买房买车，有的升职加薪。而我呢，还在做着一份不上不下的工作，存款少得可怜，感情也没有着落。有时候真的很焦虑，觉得自己的人生是不是走错了方向。但又不知道该往哪里走。', channel: 'treehole', mood: 'lost', tags: ['secret'], author: sampleIdentities[2], likes: 5, likedBy: ['sample_1','sample_2','sample_4','sample_5'], comments: [
+      { id: 'c_5', content: '每个人都有自己的节奏，不用和别人比', author: sampleIdentities[0], authorId: 'sample_1', createdAt: now - h * 23 },
+      { id: 'c_6', content: '30岁只是一个数字，人生还有很多可能', author: sampleIdentities[4], authorId: 'sample_5', createdAt: now - h * 22 },
+      { id: 'c_7', content: '我32了也一样迷茫，你不是一个人', author: sampleIdentities[3], authorId: 'sample_4', createdAt: now - h * 20 }
+    ], emotions: { resonate: ['sample_1','sample_4'], empathy: ['sample_5'], warm: ['sample_2'] }, reports: [], createdAt: now - d },
+    // 4. 浪漫的月光 - "吐槽：为什么外卖越来越难吃了" - 生活/愤怒/吐槽,求助 - 2赞1评 - 12小时前
+    { title: '吐槽：为什么外卖越来越难吃了', content: '最近点了好几次外卖，每次都让人失望。分量越来越少，价格越来越贵，味道也大不如前。今天点了一份红烧排骨，结果全是骨头没几块肉。到底是我的口味变挑剔了，还是外卖真的越来越差了？有没有好吃的外卖推荐啊，快被饿死了！', channel: 'life', mood: 'angry', tags: ['complain', 'help'], author: sampleIdentities[3], likes: 2, likedBy: ['sample_1','sample_2'], comments: [
+      { id: 'c_8', content: '建议自己做饭，又健康又省钱', author: sampleIdentities[2], authorId: 'sample_3', createdAt: now - h * 11 }
+    ], emotions: { agree: ['sample_1'], think: ['sample_2'] }, reports: [], createdAt: now - h * 12 },
+    // 5. 勇敢的海鸥 - "推荐几本最近读过的好书" - 树洞/平静/分享,经验 - 4赞2评 - 36小时前
+    { title: '推荐几本最近读过的好书', content: '最近读了几本很不错的书，分享给大家：1.《被讨厌的勇气》- 阿德勒心理学入门，读完之后释怀了很多事。2.《活着》- 余华的经典，每次读都有不同的感受。3.《小王子》- 大人也应该读的童话。4.《人类简史》- 视角很独特，让人重新思考人类文明。', channel: 'treehole', mood: 'calm', tags: ['share', 'experience'], author: sampleIdentities[4], likes: 4, likedBy: ['sample_1','sample_2','sample_3','sample_4'], comments: [
+      { id: 'c_9', content: '《被讨厌的勇气》真的很好，推荐！', author: sampleIdentities[2], authorId: 'sample_3', createdAt: now - h * 35 },
+      { id: 'c_10', content: '《活着》每次看都会哭，太感人了', author: sampleIdentities[0], authorId: 'sample_1', createdAt: now - h * 34 }
+    ], emotions: { agree: ['sample_3','sample_1'], warm: ['sample_2'] }, reports: [], createdAt: now - h * 36 },
+    // 6. 温柔的猫咪 - "考研倒计时30天，好焦虑" - 校园/焦虑/心事,日常 - 4赞2评 - 5小时前
+    { title: '考研倒计时30天，好焦虑', content: '考研倒计时30天了，感觉什么都没准备好。政治大题还没背熟，英语作文模板也没整理完，专业课还有好多知识点没搞懂。每天在图书馆从早到晚，但效率越来越低。室友都保研了，只有我还在苦哈哈地备考。有时候真的会怀疑自己的选择...', channel: 'campus', mood: 'anxious', tags: ['secret', 'daily'], author: sampleIdentities[0], likes: 4, likedBy: ['sample_2','sample_3','sample_4','sample_5'], comments: [
+      { id: 'c_11', content: '加油！最后30天坚持住，你一定可以的！', author: sampleIdentities[4], authorId: 'sample_5', createdAt: now - h * 4 },
+      { id: 'c_12', content: '焦虑说明你在乎，适当放松也很重要哦', author: sampleIdentities[2], authorId: 'sample_3', createdAt: now - h * 3 }
+    ], emotions: { empathy: ['sample_5','sample_3'], resonate: ['sample_2'] }, reports: [], createdAt: now - h * 5 },
+    // 7. 浪漫的月光 - "暗恋了三年的同事今天离职了" - 情感/难过/心事 - 5赞2评 - 48小时前
+    { title: '暗恋了三年的同事今天离职了', content: '暗恋了三年的同事今天离职了。最后一天我鼓起勇气想跟他说点什么，但话到嘴边又咽了回去。看着他收拾东西离开的背影，心里空落落的。三年了，连一句喜欢都没说出口。也许这就是错过吧。以后再也没有理由每天期待去上班了。', channel: 'emotion', mood: 'sad', tags: ['secret'], author: sampleIdentities[3], likes: 5, likedBy: ['sample_1','sample_2','sample_3','sample_4','sample_5'], comments: [
+      { id: 'c_13', content: '可以加他微信保持联系啊，还来得及', author: sampleIdentities[0], authorId: 'sample_1', createdAt: now - h * 47 },
+      { id: 'c_14', content: '至少你知道自己的心意，下次勇敢一点', author: sampleIdentities[4], authorId: 'sample_5', createdAt: now - h * 46 }
+    ], emotions: { empathy: ['sample_1','sample_2','sample_5'], touched: ['sample_3'], resonate: ['sample_4'] }, reports: [], createdAt: now - d * 2 }
   ];
 
   // 添加 id 和 authorId
   const posts = samplePosts.map((p, i) => ({
     ...p,
-    id: 'post_' + (i + 1),
+    id: 'p_' + (i + 1),
     authorId: p.author.id,
     authorMbti: p.author.mbti,
     images: [],
-    createdAt: p.createdAt || (Date.now() - 86400000 * (20 - i))
+    createdAt: p.createdAt
   }));
 
   DB.set('posts', posts);
 
   // 示例日记
   const sampleDiaries = [
-    { id: 'diary_1', date: new Date(Date.now() - 86400000 * 2).toISOString().slice(0, 16), content: '今天天气很好，出去散了步。路边的花都开了，春天真的来了。虽然最近压力很大，但看到这些花心情好了很多。', mood: 'calm', isPublic: true, createdAt: Date.now() - 86400000 * 2 },
-    { id: 'diary_2', date: new Date(Date.now() - 86400000).toISOString().slice(0, 16), content: '和朋友吃了一顿火锅，聊了很多以前的事情。时间过得真快，转眼我们都毕业好几年了。希望我们的友谊能一直延续下去。', mood: 'happy', isPublic: false, createdAt: Date.now() - 86400000 },
-    { id: 'diary_3', date: new Date().toISOString().slice(0, 16), content: '新的一天，新的开始。虽然昨天失眠了，但今天还是要打起精神来。给自己加油！', mood: 'expect', isPublic: false, createdAt: Date.now() }
+    { id: 'diary_1', date: new Date(now - d * 2).toISOString().slice(0, 16), content: '今天天气很好，出去散了步。路边的花都开了，春天真的来了。虽然最近压力很大，但看到这些花心情好了很多。', mood: 'calm', isPublic: true, createdAt: now - d * 2 },
+    { id: 'diary_2', date: new Date(now - d).toISOString().slice(0, 16), content: '和朋友吃了一顿火锅，聊了很多以前的事情。时间过得真快，转眼我们都毕业好几年了。希望我们的友谊能一直延续下去。', mood: 'happy', isPublic: false, createdAt: now - d },
+    { id: 'diary_3', date: new Date().toISOString().slice(0, 16), content: '新的一天，新的开始。虽然昨天失眠了，但今天还是要打起精神来。给自己加油！', mood: 'expect', isPublic: false, createdAt: now }
   ];
   DB.set('diaries', sampleDiaries);
 
   // 示例回信
   const sampleLetters = [
-    { id: 'letter_1', content: '亲爱的未来的我，希望你已经实现了现在的梦想。不管遇到什么困难，都不要放弃。记住现在的你有多么勇敢和坚强。加油！', openAt: Date.now() + 7 * 24 * 60 * 60 * 1000, createdAt: Date.now() - 86400000 * 10 },
-    { id: 'letter_2', content: '给一年后的自己：你现在还在做那份工作吗？有没有学会做饭？有没有去旅行？希望你过得开心。', openAt: Date.now() + 365 * 24 * 60 * 60 * 1000, createdAt: Date.now() - 86400000 * 5 }
+    { id: 'letter_1', content: '亲爱的未来的我，希望你已经实现了现在的梦想。不管遇到什么困难，都不要放弃。记住现在的你有多么勇敢和坚强。加油！', openAt: now + 7 * d, createdAt: now - d * 10 },
+    { id: 'letter_2', content: '给一年后的自己：你现在还在做那份工作吗？有没有学会做饭？有没有去旅行？希望你过得开心。', openAt: now + 365 * d, createdAt: now - d * 5 }
   ];
   DB.set('letters', sampleLetters);
 
@@ -2280,14 +2217,14 @@ function initSampleData() {
   const sampleConversations = [
     {
       id: 'conv_1',
-      partnerId: 'sample1',
+      partnerId: 'sample_1',
       partner: sampleIdentities[0],
       messages: [
-        { id: 'msg_1', content: '你好呀，看了你的帖子很有感触', senderId: 'sample2', createdAt: Date.now() - 86400000 * 3 },
-        { id: 'msg_2', content: '谢谢你的关心，真的很温暖', senderId: 'sample1', createdAt: Date.now() - 86400000 * 3 + 3600000 },
-        { id: 'msg_3', content: '有什么想说的都可以跟我聊', senderId: 'sample2', createdAt: Date.now() - 86400000 * 2 }
+        { id: 'm_1', content: '你好呀，看了你的帖子很有感触', senderId: 'sample_2', createdAt: now - d * 3 },
+        { id: 'm_2', content: '谢谢你的关心，真的很温暖', senderId: 'sample_1', createdAt: now - d * 3 + h },
+        { id: 'm_3', content: '有什么想说的都可以跟我聊', senderId: 'sample_2', createdAt: now - d * 2 }
       ],
-      createdAt: Date.now() - 86400000 * 3,
+      createdAt: now - d * 3,
       unread: 0
     }
   ];
