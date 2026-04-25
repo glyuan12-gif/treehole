@@ -2439,3 +2439,250 @@ select {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* ============================================
+   Logo 呼吸动画系统
+   ============================================ */
+
+/* Logo 整体容器 */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Logo 文字 */
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-warm));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+}
+
+/* Logo 图标呼吸脉动 */
+.logo-icon {
+  filter: url(#logoGlow);
+  animation: logoBreathe 4s ease-in-out infinite;
+}
+
+/* 树冠各层独立呼吸 - 错开时间创造有机感 */
+.logo-crown-1 {
+  animation: crownBreathe1 4s ease-in-out infinite;
+  transform-origin: 20px 20px;
+}
+.logo-crown-2 {
+  animation: crownBreathe2 4s ease-in-out infinite 0.3s;
+  transform-origin: 13px 20px;
+}
+.logo-crown-3 {
+  animation: crownBreathe3 4s ease-in-out infinite 0.6s;
+  transform-origin: 27px 20px;
+}
+
+/* 树洞呼吸 - 洞口微微扩张收缩 */
+.logo-hole {
+  animation: holeBreathe 4s ease-in-out infinite 0.2s;
+}
+
+/* Hero 大 Logo */
+.hero-logo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+  animation: logoFloat 6s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(91, 140, 110, 0.2));
+}
+
+/* 整体 Logo 呼吸 - 缩放 + 透明度 */
+@keyframes logoBreathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.9; }
+}
+
+/* 树冠层1 - 轻微上浮 */
+@keyframes crownBreathe1 {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.04) translateY(-0.5px); }
+}
+
+/* 树冠层2 - 略大范围 */
+@keyframes crownBreathe2 {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.06) translateY(-0.8px); }
+}
+
+/* 树冠层3 - 略大范围 */
+@keyframes crownBreathe3 {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.06) translateY(-0.8px); }
+}
+
+/* 洞口呼吸 - 微微扩张 */
+@keyframes holeBreathe {
+  0%, 100% { rx: 4.5; ry: 5.5; opacity: 0.9; }
+  50% { rx: 5; ry: 6; opacity: 0.85; }
+}
+
+/* Hero Logo 漂浮 */
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(1deg); }
+  75% { transform: translateY(1px) rotate(-0.5deg); }
+}
+
+/* Hero 标题优化 */
+.hero-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   整体视觉优化
+   ============================================ */
+
+/* 导航栏增加底部微光线条 */
+.navbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent-warm), transparent);
+  opacity: 0.3;
+}
+
+/* 帖子卡片入场动画 */
+.post-card {
+  animation: cardFadeIn 0.5s ease forwards;
+  opacity: 0;
+}
+
+/* 卡片依次入场（通过 JS 设置 animation-delay） */
+.post-card:nth-child(1) { animation-delay: 0.05s; }
+.post-card:nth-child(2) { animation-delay: 0.1s; }
+.post-card:nth-child(3) { animation-delay: 0.15s; }
+.post-card:nth-child(4) { animation-delay: 0.2s; }
+.post-card:nth-child(5) { animation-delay: 0.25s; }
+.post-card:nth-child(6) { animation-delay: 0.3s; }
+.post-card:nth-child(7) { animation-delay: 0.35s; }
+.post-card:nth-child(8) { animation-delay: 0.4s; }
+.post-card:nth-child(9) { animation-delay: 0.45s; }
+.post-card:nth-child(10) { animation-delay: 0.5s; }
+
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero 区域优化 */
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hero 背景光晕 */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--accent-light) 0%, transparent 70%);
+  opacity: 0.5;
+  animation: heroGlow 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes heroGlow {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.4; }
+  50% { transform: translateX(-50%) scale(1.2); opacity: 0.6; }
+}
+
+/* 按钮增加微光扫过效果 */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: skewX(-20deg);
+  animation: btnShine 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes btnShine {
+  0%, 100% { left: -60%; }
+  50% { left: 120%; }
+}
+
+/* 底部 Tab 栏增加顶部微光 */
+.tab-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* FAB 按钮增加呼吸光晕 */
+.tab-fab {
+  animation: fabPulse 3s ease-in-out infinite;
+}
+
+@keyframes fabPulse {
+  0%, 100% { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  50% { box-shadow: 0 4px 20px rgba(91, 140, 110, 0.35); }
+}
+
+/* 筛选标签选中态增加微光 */
+.filter-chip.active {
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-chip.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: chipShine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes chipShine {
+  0%, 100% { left: -100%; }
+  50% { left: 100%; }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .logo-icon, .logo-crown-1, .logo-crown-2, .logo-crown-3, .logo-hole,
+  .hero-logo, .hero::before, .btn-primary::after, .tab-fab,
+  .filter-chip.active::after, .post-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
