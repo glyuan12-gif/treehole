@@ -18,26 +18,28 @@
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   --max-width: 720px;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 1px 3px rgba(45,42,38,0.04);
+  --shadow-md: 0 4px 20px rgba(45,42,38,0.06);
+  --shadow-lg: 0 12px 40px rgba(45,42,38,0.1);
+  --shadow-glow: 0 0 24px rgba(91,140,110,0.10);
+  --focus-ring: rgba(91,140,110,0.25);
 }
 
 /* 月光森林 (light) - 默认主题 */
 [data-theme="light"],
 :root {
   --bg-primary: #f8f6f1;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f0ede6;
-  --text-primary: #2c2c2c;
-  --text-secondary: #666666;
-  --text-muted: #999999;
+  --bg-secondary: #fffefa;
+  --bg-tertiary: #f0ece3;
+  --text-primary: #2d2a26;
+  --text-secondary: #5a554d;
+  --text-muted: #7d7870;
   --accent: #5b8c6e;
-  --accent-light: #e8f5ee;
-  --accent-hover: #4a7a5e;
+  --accent-light: #eef5f0;
+  --accent-hover: #4a7a5c;
   --accent-warm: #c4956a;
-  --border: #e0dcd4;
-  --navbar-bg: rgba(248, 246, 241, 0.85);
+  --border: #e8e4db;
+  --navbar-bg: rgba(248,246,241,0.82);
   --font-display: 'LXGW WenKai', serif;
   --font-body: 'LXGW WenKai', 'Noto Sans SC', sans-serif;
 }
@@ -45,17 +47,17 @@
 /* 暗夜森林 (dark) */
 [data-theme="dark"] {
   --bg-primary: #1c1b18;
-  --bg-secondary: #2a2825;
-  --bg-tertiary: #353230;
-  --text-primary: #e8e6e1;
-  --text-secondary: #b0ada6;
-  --text-muted: #7a7770;
+  --bg-secondary: #252420;
+  --bg-tertiary: #302e28;
+  --text-primary: #e8e4db;
+  --text-secondary: #b0aaa2;
+  --text-muted: #9a948c;
   --accent: #6fa882;
-  --accent-light: #2a3d30;
-  --accent-hover: #5b9470;
+  --accent-light: #1e2e24;
+  --accent-hover: #5b9a70;
   --accent-warm: #d4a574;
-  --border: #3a3835;
-  --navbar-bg: rgba(28, 27, 24, 0.85);
+  --border: #3a3730;
+  --navbar-bg: rgba(28,27,24,0.82);
   --font-display: 'LXGW WenKai', serif;
   --font-body: 'LXGW WenKai', 'Noto Sans SC', sans-serif;
 }
@@ -63,17 +65,17 @@
 /* 星空 (starry) */
 [data-theme="starry"] {
   --bg-primary: #0f0f1a;
-  --bg-secondary: #1a1a2e;
-  --bg-tertiary: #252540;
-  --text-primary: #e8e6f0;
-  --text-secondary: #a0a0b8;
-  --text-muted: #6a6a80;
+  --bg-secondary: #181828;
+  --bg-tertiary: #222238;
+  --text-primary: #e0dff0;
+  --text-secondary: #b0aec8;
+  --text-muted: #8a88a8;
   --accent: #7b8cde;
-  --accent-light: #2a2d4a;
-  --accent-hover: #6a7bcf;
+  --accent-light: #1a1e35;
+  --accent-hover: #6a7bd0;
   --accent-warm: #c495d4;
-  --border: #2a2a40;
-  --navbar-bg: rgba(15, 15, 26, 0.85);
+  --border: #2a2a42;
+  --navbar-bg: rgba(15,15,26,0.85);
   --font-display: 'Ma Shan Zheng', cursive;
   --font-body: 'LXGW WenKai', 'Noto Sans SC', sans-serif;
 }
@@ -81,17 +83,17 @@
 /* 樱花 (sakura) */
 [data-theme="sakura"] {
   --bg-primary: #fdf6f8;
-  --bg-secondary: #ffffff;
+  --bg-secondary: #fffafc;
   --bg-tertiary: #f8eef2;
-  --text-primary: #3a2a30;
-  --text-secondary: #7a5a65;
-  --text-muted: #a08090;
+  --text-primary: #3d2a30;
+  --text-secondary: #7a5a64;
+  --text-muted: #a08088;
   --accent: #d4728a;
-  --accent-light: #fce8ee;
+  --accent-light: #fdf0f3;
   --accent-hover: #c4627a;
-  --accent-warm: #e8a070;
-  --border: #f0dde5;
-  --navbar-bg: rgba(253, 246, 248, 0.85);
+  --accent-warm: #c4956a;
+  --border: #f0dde3;
+  --navbar-bg: rgba(253,246,248,0.85);
   --font-display: 'Ma Shan Zheng', cursive;
   --font-body: 'LXGW WenKai', 'Noto Sans SC', sans-serif;
 }
@@ -99,17 +101,17 @@
 /* 暖阳 (sunny) */
 [data-theme="sunny"] {
   --bg-primary: #faf8f2;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f5f0e5;
-  --text-primary: #3a3520;
-  --text-secondary: #7a7060;
-  --text-muted: #a09880;
+  --bg-secondary: #fffdf8;
+  --bg-tertiary: #f3efe5;
+  --text-primary: #3a3528;
+  --text-secondary: #7a7260;
+  --text-muted: #9e9680;
   --accent: #d4944a;
-  --accent-light: #fdf0e0;
+  --accent-light: #fdf5eb;
   --accent-hover: #c4843a;
-  --accent-warm: #c47070;
-  --border: #e8e0d0;
-  --navbar-bg: rgba(250, 248, 242, 0.85);
+  --accent-warm: #c46a5a;
+  --border: #e8e2d4;
+  --navbar-bg: rgba(250,248,242,0.85);
   --font-display: 'Ma Shan Zheng', cursive;
   --font-body: 'LXGW WenKai', 'Noto Sans SC', sans-serif;
 }
@@ -176,10 +178,10 @@ select {
   width: 100%;
   z-index: 100;
   background: var(--navbar-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
   border-bottom: 1px solid var(--border);
-  height: 56px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -418,14 +420,25 @@ select {
   padding: 16px;
   margin-bottom: 12px;
   border: 1px solid var(--border);
+  border-left: 3px solid transparent;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .post-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
   transform: translateY(-2px);
+  border-left-width: 4px;
 }
+
+.post-card[data-mood="happy"] { border-left-color: #e8c84a; }
+.post-card[data-mood="calm"] { border-left-color: #6fa882; }
+.post-card[data-mood="moved"] { border-left-color: #e57399; }
+.post-card[data-mood="anxious"] { border-left-color: #e8a84a; }
+.post-card[data-mood="sad"] { border-left-color: #5a9ad4; }
+.post-card[data-mood="angry"] { border-left-color: #d45a5a; }
+.post-card[data-mood="lost"] { border-left-color: #a06ab8; }
+.post-card[data-mood="expect"] { border-left-color: #4ac4c4; }
 
 .post-card-header {
   display: flex;
@@ -558,51 +571,15 @@ select {
   color: var(--text-muted);
 }
 
-.mood-badge {
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
-}
-
-.mood-badge.mood-happy {
-  background: #e8f5e9;
-  color: #4caf50;
-}
-
-.mood-badge.mood-calm {
-  background: #e3f2fd;
-  color: #2196f3;
-}
-
-.mood-badge.mood-moved {
-  background: #fce4ec;
-  color: #e91e63;
-}
-
-.mood-badge.mood-anxious {
-  background: #fff3e0;
-  color: #ff9800;
-}
-
-.mood-badge.mood-sad {
-  background: #e8eaf6;
-  color: #3f51b5;
-}
-
-.mood-badge.mood-angry {
-  background: #ffebee;
-  color: #f44336;
-}
-
-.mood-badge.mood-lost {
-  background: #f3e5f5;
-  color: #9c27b0;
-}
-
-.mood-badge.mood-expect {
-  background: #e0f7fa;
-  color: #00bcd4;
-}
+.mood-badge { padding: 2px 10px; border-radius: var(--radius-full); font-size: 12px; }
+.mood-happy { background: #fdf6e3; color: #b8860b; }
+.mood-calm { background: #eef5f0; color: #3d7a52; }
+.mood-moved { background: #fce8ec; color: #c2185b; }
+.mood-anxious { background: #fef0e0; color: #d4760a; }
+.mood-sad { background: #e6eef6; color: #2c5f8a; }
+.mood-angry { background: #f8e8e8; color: #a52a2a; }
+.mood-lost { background: #f0e8f4; color: #6a3d7d; }
+.mood-expect { background: #e4f4f6; color: #1a7a7a; }
 
 .post-card-footer {
   display: flex;
@@ -1172,9 +1149,10 @@ select {
 }
 
 .chat-bubble-wrap.sent .chat-bubble {
-  background: var(--accent);
-  color: #ffffff;
+  background: var(--accent-light);
+  color: var(--text-primary);
   border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(91,140,110,0.15);
 }
 
 .chat-bubble-wrap.received .chat-bubble {
@@ -1664,7 +1642,7 @@ select {
   height: 60px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
-  display: flex;
+  display: none; /* 默认隐藏，移动端显示 */
   align-items: center;
   justify-content: space-around;
   z-index: 100;
@@ -1714,7 +1692,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(91,140,110,0.35);
   transition: var(--transition);
   margin-top: -20px;
 }
@@ -1757,7 +1735,9 @@ select {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(28,27,24,0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 200;
   display: none;
   align-items: center;
@@ -1774,7 +1754,7 @@ select {
 
 .modal {
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
   width: 100%;
   max-width: 480px;
   max-height: 85vh;
@@ -1855,6 +1835,7 @@ select {
   letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(91,140,110,0.15), 0 0 0 1px rgba(91,140,110,0.06);
 }
 
 .btn-primary::before {
@@ -1870,7 +1851,7 @@ select {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 6px 24px rgba(91,140,110,0.25), 0 0 0 1px rgba(91,140,110,0.1);
   letter-spacing: 1px;
 }
 
@@ -1899,17 +1880,15 @@ select {
 .btn-danger {
   padding: 10px 24px;
   border-radius: 24px;
-  background: #e74c3c;
-  color: #ffffff;
+  background: #a52a2a;
+  color: white;
   border: none;
   font-size: 14px;
   cursor: pointer;
   transition: var(--transition);
+  box-shadow: 0 2px 12px rgba(165,42,42,0.2);
 }
-
-.btn-danger:hover {
-  background: #c0392b;
-}
+.btn-danger:hover { background: #8b1a1a; }
 
 .btn-sm {
   padding: 6px 16px;
@@ -1926,7 +1905,7 @@ select {
 
 .toast-container {
   position: fixed;
-  top: 70px;
+  bottom: 32px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 300;
@@ -1943,9 +1922,15 @@ select {
   color: var(--bg-primary);
   font-size: 14px;
   box-shadow: var(--shadow-lg);
-  animation: toastIn 0.3s ease;
   pointer-events: auto;
   white-space: nowrap;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .toast.success {
@@ -2319,6 +2304,18 @@ select {
    ============================================ */
 
 @media (max-width: 768px) {
+  /* 桌面端隐藏底部Tab */
+  .tab-bar {
+    display: flex !important;
+  }
+  .navbar {
+    height: 56px;
+  }
+  .main-content {
+    margin-bottom: 0;
+    padding: 72px 14px 32px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  }
   .main-content {
     padding: 12px;
   }
@@ -2685,6 +2682,195 @@ select {
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* ============================================
+   背景装饰层
+   ============================================ */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+}
+
+.bg-orb-1 {
+  width: 400px; height: 400px;
+  top: -100px; right: -100px;
+  background: radial-gradient(circle, rgba(91,140,110,0.3), transparent 70%);
+  animation: orbFloat 20s ease-in-out infinite;
+}
+
+.bg-orb-2 {
+  width: 350px; height: 350px;
+  bottom: -80px; left: -80px;
+  background: radial-gradient(circle, rgba(196,149,106,0.25), transparent 70%);
+  animation: orbFloat 24s ease-in-out infinite 5s;
+}
+
+.bg-orb-3 {
+  width: 300px; height: 300px;
+  top: 40%; left: 30%;
+  background: radial-gradient(circle, rgba(91,140,110,0.15), transparent 70%);
+  animation: orbFloat 28s ease-in-out infinite 10s;
+}
+
+.bg-orb-4 {
+  width: 250px; height: 250px;
+  top: 20%; right: 20%;
+  background: radial-gradient(circle, rgba(196,149,106,0.2), transparent 70%);
+  animation: orbFloat 22s ease-in-out infinite 15s;
+}
+
+.bg-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+[data-theme="dark"] .bg-orb,
+[data-theme="starry"] .bg-orb {
+  opacity: 0.15;
+  filter: blur(100px);
+}
+
+[data-theme="dark"] .bg-grain,
+[data-theme="starry"] .bg-grain {
+  opacity: 0.04;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, -30px) scale(1.05); }
+  50% { transform: translate(-15px, 20px) scale(0.95); }
+  75% { transform: translate(25px, 15px) scale(1.02); }
+}
+
+/* 确保内容在装饰层之上 */
+.navbar, .main-content, .tab-bar, .toast-container, .modal-overlay, .image-viewer, .fab {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================
+   新增动画
+   ============================================ */
+
+/* Logo 绿点脉冲 */
+@keyframes logoDotPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+.logo-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+  animation: logoDotPulse 2.5s ease-in-out infinite;
+}
+
+/* 消息徽章弹出 */
+@keyframes badgePop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.msg-badge {
+  animation: badgePop 0.3s ease;
+}
+
+/* 页面切入 */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.page.active {
+  animation: pageIn 0.4s ease;
+}
+
+/* 点赞心跳 */
+@keyframes likeHeartbeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.3); }
+  30% { transform: scale(0.95); }
+  45% { transform: scale(1.15); }
+  60% { transform: scale(1); }
+}
+
+.post-action.liked svg {
+  animation: likeHeartbeat 0.4s ease;
+}
+
+/* 情绪反应弹跳 */
+@keyframes reactionBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2); }
+  50% { transform: scale(0.9); }
+  70% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.emotion-btn.active .emotion-emoji {
+  animation: reactionBounce 0.5s ease;
+}
+
+/* 新评论滑入 */
+@keyframes commentSlideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 信件打开动画 */
+@keyframes letterOpen {
+  from { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+  to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.letter-opening-icon {
+  animation: letterOpen 0.6s ease;
+}
+
+/* 空状态树摇摆 */
+@keyframes emptySway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+.empty-tree {
+  animation: emptySway 3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* 空状态树叶飘浮 */
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+  50% { transform: translateY(-8px) rotate(10deg); opacity: 1; }
+}
+
+/* 空状态光晕脉冲 */
+@keyframes emptyGlowPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.empty-glow {
+  animation: emptyGlowPulse 3s ease-in-out infinite;
 }
 
 /* ============================================

@@ -291,9 +291,11 @@ function showToast(message, type = '') {
   toast.className = 'toast ' + type;
   toast.textContent = message;
   container.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+  });
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(-10px)';
+    toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
   }, 2500);
 }
@@ -555,7 +557,7 @@ function renderPostCard(post) {
   }
 
   return `
-    <div class="post-card" onclick="navigate('detail', {postId: '${post.id}'})">
+    <div class="post-card${post.mood ? ' data-mood="'+post.mood+'"' : ''}" onclick="navigate('detail', {postId: '${post.id}'})">
       <div class="post-card-header">
         ${renderAvatar(post.author)}
         <div class="post-author-info">
@@ -1300,8 +1302,14 @@ function updateUnreadBadge() {
   if (totalUnread > 0) {
     navBadge.textContent = totalUnread > 99 ? '99+' : totalUnread;
     navBadge.style.display = 'flex';
+    navBadge.classList.remove('msg-badge');
+    void navBadge.offsetWidth; // 触发 reflow
+    navBadge.classList.add('msg-badge');
     tabBadge.textContent = totalUnread > 99 ? '99+' : totalUnread;
     tabBadge.style.display = 'flex';
+    tabBadge.classList.remove('msg-badge');
+    void tabBadge.offsetWidth;
+    tabBadge.classList.add('msg-badge');
   } else {
     navBadge.style.display = 'none';
     tabBadge.style.display = 'none';
