@@ -558,7 +558,7 @@ function renderPostCard(post) {
   }
 
   return `
-    <div class="post-card${post.mood ? ' data-mood="'+post.mood+'"' : ''}" onclick="navigate('detail', {postId: '${post.id}'})">
+    <div class="post-card"${post.mood ? ' data-mood="'+post.mood+'"' : ''} onclick="navigate('detail', {postId: '${post.id}'})">
       <div class="post-card-header">
         ${renderAvatar(post.author)}
         <div class="post-author-info">
@@ -861,8 +861,8 @@ function renderDetail(postId) {
 
   const container = document.getElementById('detailContent');
   container.innerHTML = `
-    <button class="btn-ghost btn-sm" onclick="navigate('home')" style="margin-bottom:16px">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle"><polyline points="15 18 9 12 15 6"/></svg>
+    <button class="btn-ghost btn-sm" onclick="navigate('home')" style="margin-bottom:16px" aria-label="返回首页">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
       返回
     </button>
     <div class="detail-card">
@@ -903,7 +903,7 @@ function renderDetail(postId) {
       <div class="comments-section">
         <h3 style="font-size:16px;margin-bottom:12px;color:var(--text-primary)">评论 (${post.comments ? post.comments.length : 0})</h3>
         <div class="comment-input-wrap">
-          <input type="text" class="comment-input" id="commentInput" placeholder="写下你的想法..." maxlength="500">
+          <input type="text" class="comment-input" id="commentInput" placeholder="写下你的想法…" maxlength="500">
           <button class="comment-send" onclick="submitComment('${post.id}')">发送</button>
         </div>
         <div id="commentList">${commentsHtml}</div>
@@ -1871,6 +1871,13 @@ function switchTheme(themeId) {
   DB.set('theme', themeId);
   applyThemePattern(themeId);
   renderThemeOptions();
+  // 更新 theme-color meta 标签
+  const themeColors = {
+    light: '#f8f6f1', dark: '#1a1b1e', starry: '#0f172a',
+    sakura: '#fdf2f4', sunny: '#fffbeb'
+  };
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = themeColors[themeId] || '#f8f6f1';
   showToast('主题已切换', 'success');
 }
 
@@ -2303,6 +2310,13 @@ function initApp() {
   const theme = DB.get('theme', 'light');
   document.documentElement.setAttribute('data-theme', theme);
   applyThemePattern(theme);
+  // 初始化 theme-color
+  const themeColors = {
+    light: '#f8f6f1', dark: '#1a1b1e', starry: '#0f172a',
+    sakura: '#fdf2f4', sunny: '#fffbeb'
+  };
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) metaThemeColor.content = themeColors[theme] || '#f8f6f1';
 
   // 恢复 Hero 折叠状态
   if (DB.get('hero_collapsed', false)) {

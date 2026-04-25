@@ -259,6 +259,10 @@ select {
   transform: scale(1.05);
 }
 
+.nav-btn:active {
+  transform: scale(0.92);
+}
+
 .nav-btn svg {
   width: 20px;
   height: 20px;
@@ -291,7 +295,7 @@ select {
    ============================================ */
 
 .main-content {
-  margin-top: 56px;
+  margin-top: 64px;
   margin-bottom: 60px;
   padding: 16px;
   max-width: var(--max-width);
@@ -469,6 +473,19 @@ select {
   box-shadow: var(--shadow-md), var(--shadow-glow);
   transform: translateY(-2px);
   border-left-width: 4px;
+}
+
+.post-card:active {
+  transform: scale(0.98);
+  transition: transform 0.1s;
+}
+
+@media (hover: none) {
+  .post-card:hover {
+    box-shadow: none;
+    transform: none;
+    border-left-width: 3px;
+  }
 }
 
 .post-card[data-mood="happy"] { border-left-color: #e8c84a; }
@@ -1086,6 +1103,10 @@ select {
 
 .conversation-item:hover {
   background: var(--bg-tertiary);
+}
+
+.conversation-item:active {
+  background: var(--accent-light);
 }
 
 .conversation-item.active {
@@ -1712,6 +1733,10 @@ select {
   color: var(--text-secondary);
 }
 
+.tab-item:active {
+  transform: scale(0.9);
+}
+
 .tab-item.active {
   color: var(--accent);
 }
@@ -2047,6 +2072,15 @@ select {
   color: var(--text-secondary);
 }
 
+.filter-chip:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.filter-chip:active {
+  transform: scale(0.95);
+}
+
 .mbti-option:hover {
   border-color: var(--accent);
   background: var(--accent-light);
@@ -2350,20 +2384,22 @@ select {
    ============================================ */
 
 @media (max-width: 768px) {
-  /* 桌面端隐藏底部Tab */
+  /* 移动端显示底部Tab */
   .tab-bar {
     display: flex !important;
   }
+
+  /* 导航栏缩小 */
   .navbar {
     height: 56px;
   }
+
+  /* main-content 适配导航栏 + Tab栏 */
   .main-content {
-    margin-bottom: 0;
-    padding: 72px 14px 32px;
-    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
-  }
-  .main-content {
+    margin-top: 56px;
+    margin-bottom: 54px;
     padding: 12px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .hero-title {
@@ -2376,6 +2412,93 @@ select {
 
   .random-card {
     width: 260px;
+  }
+
+  /* 导航按钮触摸目标 44px */
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* 筛选标签触摸高度 */
+  .filter-chip {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  /* 聊天页面适配 */
+  .chat-view {
+    height: calc(100vh - 56px - 54px);
+  }
+
+  .chat-bubble {
+    max-width: 80%;
+  }
+
+  /* 模态框移动端适配 */
+  .modal {
+    max-height: 85vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 16px;
+    margin: 8px;
+  }
+
+  .modal-overlay {
+    padding: 8px;
+    align-items: flex-end;
+  }
+
+  /* 帖子详情适配 */
+  .detail-page .detail-card {
+    padding: 16px;
+  }
+
+  .detail-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .detail-action-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* 设置页适配 */
+  .settings-section {
+    padding: 16px;
+  }
+
+  /* 日历适配 */
+  .calendar-grid {
+    gap: 2px;
+  }
+
+  /* FAB 按钮适配 */
+  .fab {
+    bottom: 70px;
+  }
+
+  /* Hero 区域缩小 */
+  .hero {
+    padding: 24px 16px 16px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hero-actions .btn-primary,
+  .hero-actions .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 搜索栏适配 */
+  .search-bar {
+    margin: 0 -12px;
+    padding: 0 12px;
   }
 }
 
@@ -2398,7 +2521,13 @@ select {
 
   .modal {
     padding: 16px;
-    margin: 8px;
+    margin: 4px;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+
+  .modal-overlay {
+    padding: 4px;
   }
 
   .emoji-grid {
@@ -2416,6 +2545,80 @@ select {
   .calendar-day {
     padding: 6px 2px;
     font-size: 13px;
+  }
+
+  /* 导航栏 logo 缩小 */
+  .navbar-logo {
+    font-size: 18px;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* 导航按钮间距 */
+  .navbar-actions {
+    gap: 4px;
+  }
+
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* 筛选标签更紧凑 */
+  .filter-chip {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  /* 聊天气泡 */
+  .chat-bubble {
+    max-width: 85%;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  /* 帖子操作按钮 */
+  .post-actions {
+    gap: 12px;
+  }
+
+  .post-action-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  /* 评论输入框 */
+  .comment-input {
+    font-size: 14px;
+  }
+
+  /* 设置页 */
+  .settings-section {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .color-grid {
+    gap: 6px;
+  }
+
+  .color-option {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* MBTI 测试 */
+  .mbti-option {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* 信件/日记页面 */
+  .letter-card, .diary-card {
+    padding: 12px;
   }
 }
 
