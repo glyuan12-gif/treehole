@@ -747,6 +747,24 @@ select {
   color: var(--text-muted);
 }
 
+.empty-action {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 20px;
+  border-radius: 20px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+}
+
+.empty-action:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
 /* ============================================
    10. 发帖页面 (.create-page)
    ============================================ */
@@ -1797,6 +1815,18 @@ select {
 
 .tab-item.active {
   color: var(--accent);
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
 }
 
 .tab-item svg {
@@ -3002,6 +3032,7 @@ select {
   border-radius: 50%;
   filter: blur(80px);
   opacity: 0.35;
+  will-change: transform;
 }
 
 .bg-orb-1 {

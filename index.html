@@ -2,9 +2,15 @@
 <html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f8f6f1">
   <title>树洞 · 匿名分享</title>
+  <meta name="description" content="树洞是一个匿名社交平台，让你安全地分享心事、找到共鸣的灵魂。">
+  <meta property="og:title" content="树洞 · 匿名分享">
+  <meta property="og:description" content="匿名分享你的心事，找到共鸣的灵魂">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://glyuan12-gif.github.io/treehole/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -49,10 +55,10 @@
 </nav>
 
 <!-- 主内容区 -->
-<div class="main-content" id="mainContent">
+<main class="main-content" id="mainContent">
 
   <!-- 首页 -->
-  <div class="page active" id="page-home">
+  <section class="page active" id="page-home">
     <!-- Hero 区域 -->
     <div class="hero" id="heroSection">
       <h1 class="hero-title">
@@ -117,10 +123,10 @@
       <p class="empty-state-title">这里还没有帖子</p>
       <p class="empty-state-text">成为第一个分享心事的人吧 ✨</p>
     </div>
-  </div>
+  </section>
 
   <!-- 发帖页面 -->
-  <div class="page" id="page-create">
+  <section class="page" id="page-create">
     <div class="create-form">
       <h2 style="font-family:var(--font-display);font-size:22px;margin-bottom:20px;color:var(--text-primary)">分享你的心事</h2>
       <!-- 频道选择 -->
@@ -193,15 +199,15 @@
         <button class="btn-primary" style="flex:2" onclick="submitPost()">发布心事</button>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- 帖子详情页 -->
-  <div class="page" id="page-detail">
+  <section class="page" id="page-detail">
     <div id="detailContent"></div>
-  </div>
+  </section>
 
   <!-- 私信页面 -->
-  <div class="page" id="page-messages">
+  <section class="page" id="page-messages">
     <!-- 对话列表视图 -->
     <div id="conversationListView">
       <h2 style="font-family:var(--font-display);font-size:22px;margin-bottom:16px;color:var(--text-primary)">私信</h2>
@@ -233,10 +239,10 @@
         </button>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- 日记页面 -->
-  <div class="page" id="page-diary">
+  <section class="page" id="page-diary">
     <h2 style="font-family:var(--font-display);font-size:22px;margin-bottom:16px;color:var(--text-primary)">树洞日记</h2>
     <!-- 日历 -->
     <div class="calendar-container" id="calendarContainer">
@@ -261,10 +267,10 @@
       <p class="empty-state-title">还没有日记</p>
       <p class="empty-state-text">点击日历上的日期开始记录</p>
     </div>
-  </div>
+  </section>
 
   <!-- 回信页面 -->
-  <div class="page" id="page-letter">
+  <section class="page" id="page-letter">
     <h2 style="font-family:var(--font-display);font-size:22px;margin-bottom:16px;color:var(--text-primary)">树洞回信</h2>
     <div id="letterList"></div>
     <div class="empty-state" id="emptyLetter" style="display:none">
@@ -274,10 +280,10 @@
       <p class="empty-state-title">还没有回信</p>
       <p class="empty-state-text">给未来的自己写一封信吧</p>
     </div>
-  </div>
+  </section>
 
   <!-- 我的页面 -->
-  <div class="page" id="page-settings">
+  <section class="page" id="page-settings">
     <!-- 头像预览 -->
     <div class="settings-section">
       <div class="avatar-preview-large" id="settingsAvatarPreview">😊</div>
@@ -355,9 +361,9 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
-  </div>
+  </section>
 
-</div>
+</main>
 
 <!-- 底部 Tab 栏 -->
 <div class="tab-bar">

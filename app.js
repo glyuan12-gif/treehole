@@ -171,6 +171,7 @@ const App = {
 
 // 生成唯一 ID
 function genId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 11);
 }
 
@@ -322,6 +323,15 @@ function escapeHtml(text) {
 
 // ============ 5. 路由系统 ============
 function navigate(page, params = {}) {
+  // 离开 create 页面时自动保存草稿
+  if (App.currentPage === 'create') {
+    const title = document.getElementById('postTitle')?.value;
+    const content = document.getElementById('postContent')?.value;
+    if (title || content) {
+      DB.set('draft_post', { title, content, savedAt: Date.now() });
+    }
+  }
+
   // 隐藏所有页面
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
@@ -538,6 +548,16 @@ function renderPostList() {
     const emptyDesc = emptyState.querySelector('.empty-state-text');
     if (emptyTitle) emptyTitle.textContent = App.searchQuery ? '没有找到匹配的内容' : '这片森林还安静着';
     if (emptyDesc) emptyDesc.textContent = App.searchQuery ? '试试其他关键词' : '种下第一棵树…';
+    // 添加引导按钮
+    let actionBtn = emptyState.querySelector('.empty-action');
+    if (!actionBtn) {
+      actionBtn = document.createElement('button');
+      actionBtn.className = 'empty-action';
+      actionBtn.textContent = '写下第一条心事';
+      actionBtn.onclick = () => navigate('create');
+      emptyState.appendChild(actionBtn);
+    }
+    actionBtn.style.display = App.searchQuery ? 'none' : '';
     return;
   }
 
@@ -648,6 +668,17 @@ function resetCreateForm() {
 
 // 初始化发帖事件
 function initCreateForm() {
+  // 草稿恢复
+  const draft = DB.get('draft_post');
+  if (draft && draft.title) {
+    const titleEl = document.getElementById('postTitle');
+    const contentEl = document.getElementById('postContent');
+    if (titleEl && !titleEl.value) titleEl.value = draft.title;
+    if (contentEl && !contentEl.value) contentEl.value = draft.content;
+    DB.remove('draft_post');
+    showToast('已恢复上次未完成的草稿', 'info');
+  }
+
   // 字数统计
   document.getElementById('postTitle').addEventListener('input', (e) => {
     document.getElementById('titleCharCount').textContent = e.target.value.length;
@@ -694,6 +725,12 @@ function handleImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  if (!allowedTypes.includes(file.type)) {
+    showToast('仅支持 JPG/PNG/GIF 格式', 'error');
+    return;
+  }
+
   if (file.size > 2 * 1024 * 1024) {
     showToast('图片大小不能超过 2MB', 'error');
     return;
@@ -721,6 +758,10 @@ function contentReview(title, content) {
   // 敏感词检测（正则）
   for (const pattern of SENSITIVE_PATTERNS) {
     if (pattern.regex.test(fullText)) {
+      // 暴力自残类别：允许发布但标记需要显示心理热线
+      if (pattern.category === '暴力自残') {
+        return { pass: true, showCrisisHelp: true };
+      }
       return { pass: false, reason: '内容包含敏感词（' + pattern.category + '），请修改后重新发布' };
     }
   }
@@ -773,6 +814,9 @@ function submitPost() {
     showToast(review.reason, 'error');
     return;
   }
+  if (review.showCrisisHelp) {
+    showToast('如果你正在经历困难时刻，请记住你并不孤单。全国心理援助热线：400-161-9995', 'info');
+  }
 
   const identity = getIdentity();
   if (!identity) return;
@@ -800,6 +844,7 @@ function submitPost() {
   posts.unshift(post);
   DB.set('posts', posts);
 
+  DB.remove('draft_post');
   showToast('发布成功！', 'success');
   navigate('home');
 }
@@ -1111,6 +1156,15 @@ function renderConversationList() {
   if (conversations.length === 0) {
     container.innerHTML = '';
     emptyState.style.display = 'block';
+    // 添加引导按钮
+    let actionBtn = emptyState.querySelector('.empty-action');
+    if (!actionBtn) {
+      actionBtn = document.createElement('button');
+      actionBtn.className = 'empty-action';
+      actionBtn.textContent = '去发现树洞中的朋友';
+      actionBtn.onclick = () => navigate('home');
+      emptyState.appendChild(actionBtn);
+    }
     return;
   }
 
@@ -1409,6 +1463,19 @@ function renderDiaryList() {
   if (diaries.length === 0) {
     container.innerHTML = '';
     emptyState.style.display = 'block';
+    // 添加引导按钮
+    let actionBtn = emptyState.querySelector('.empty-action');
+    if (!actionBtn) {
+      actionBtn = document.createElement('button');
+      actionBtn.className = 'empty-action';
+      actionBtn.textContent = '写下今天的日记';
+      actionBtn.onclick = () => openDiaryEdit(
+        App.calendarDate.getFullYear(),
+        App.calendarDate.getMonth() + 1,
+        App.calendarDate.getDate()
+      );
+      emptyState.appendChild(actionBtn);
+    }
     return;
   }
 
@@ -1583,6 +1650,15 @@ function renderLetterList() {
   if (letters.length === 0) {
     container.innerHTML = '';
     emptyState.style.display = 'block';
+    // 添加引导按钮
+    let actionBtn = emptyState.querySelector('.empty-action');
+    if (!actionBtn) {
+      actionBtn = document.createElement('button');
+      actionBtn.className = 'empty-action';
+      actionBtn.textContent = '写一封给未来的信';
+      actionBtn.onclick = () => openLetterEdit();
+      emptyState.appendChild(actionBtn);
+    }
     return;
   }
 
@@ -2273,6 +2349,17 @@ function initApp() {
     }
   }
 }
+
+// 全局错误处理
+window.addEventListener('error', (e) => {
+  console.error('全局错误:', e.error);
+  if (e.message && !e.message.includes('ResizeObserver')) {
+    showToast('发生了一个错误，请刷新页面重试', 'error');
+  }
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('未处理的 Promise 拒绝:', e.reason);
+});
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', initApp);
