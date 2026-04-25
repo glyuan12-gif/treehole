@@ -478,21 +478,14 @@ function initFilters() {
     });
   });
 
-  // 标签筛选
-  document.querySelectorAll('[data-filter="tag"]').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('[data-filter="tag"]').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      App.filters.tag = chip.dataset.value;
+  // 标签筛选（下拉选择）
+  const tagFilterSelect = document.getElementById('tagFilterSelect');
+  if (tagFilterSelect) {
+    tagFilterSelect.addEventListener('change', (e) => {
+      App.filters.tag = e.target.value;
       renderPostList();
     });
-  });
-
-  // MBTI 筛选
-  document.getElementById('mbtiFilter').addEventListener('change', (e) => {
-    App.filters.mbti = e.target.value;
-    renderPostList();
-  });
+  }
 
   // 排序
   document.getElementById('sortFilter').addEventListener('change', (e) => {

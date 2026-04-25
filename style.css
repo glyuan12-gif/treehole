@@ -2686,3 +2686,197 @@ select {
     transform: none !important;
   }
 }
+
+/* ============================================
+   简洁化设计调整
+   ============================================ */
+
+/* Hero 区域精简 - 更紧凑 */
+.hero {
+  padding: 24px 20px 16px !important;
+}
+
+.hero-title {
+  font-size: 22px !important;
+  display: block !important;
+}
+
+.hero-subtitle {
+  font-size: 13px !important;
+  margin-bottom: 0 !important;
+}
+
+/* 移除 Hero 背景光晕（太花哨） */
+.hero::before {
+  display: none;
+}
+
+/* 筛选栏紧凑模式 */
+.filter-bar.compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0 !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.filter-bar.compact::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-bar.compact .filter-chip {
+  flex-shrink: 0;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+}
+
+.filter-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+.filter-select.compact {
+  flex-shrink: 0;
+  padding: 5px 24px 5px 10px !important;
+  font-size: 12px !important;
+  border-radius: var(--radius-full) !important;
+}
+
+/* 帖子卡片精简 - 减少内边距 */
+.post-card {
+  padding: 14px !important;
+  margin-bottom: 10px !important;
+}
+
+/* 帖子标题精简 */
+.post-title {
+  font-size: 15px !important;
+  margin-bottom: 4px !important;
+}
+
+/* 帖子正文精简 */
+.post-text {
+  font-size: 13px !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+/* 帖子标签精简 */
+.post-tags {
+  margin-top: 8px !important;
+}
+
+.post-tag, .mood-badge {
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+}
+
+/* 帖子底部精简 */
+.post-card-footer {
+  padding-top: 8px !important;
+  margin-top: 8px !important;
+}
+
+.post-action {
+  font-size: 12px !important;
+}
+
+/* 导航栏精简 */
+.navbar {
+  height: 50px !important;
+}
+
+/* 主内容区精简 */
+.main-content {
+  padding: 12px !important;
+}
+
+/* 移除帖子卡片入场动画（更简洁） */
+.post-card {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* 移除按钮微光效果 */
+.btn-primary::after {
+  display: none;
+}
+
+/* 移除筛选标签微光 */
+.filter-chip.active::after {
+  display: none;
+}
+
+/* FAB 按钮呼吸更柔和 */
+.tab-fab {
+  animation: none !important;
+}
+
+/* 底部 Tab 栏精简 */
+.tab-bar {
+  height: 54px !important;
+}
+
+.tab-item svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.tab-label {
+  font-size: 9px !important;
+}
+
+.tab-fab {
+  width: 44px !important;
+  height: 44px !important;
+  margin-top: -16px !important;
+}
+
+.tab-fab svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* 移除导航栏底部微光 */
+.navbar::after {
+  display: none;
+}
+
+/* 移除底部 Tab 顶部微光 */
+.tab-bar::before {
+  display: none;
+}
+
+/* 空状态精简 */
+.empty-state {
+  padding: 40px 20px !important;
+}
+
+.empty-state svg {
+  width: 80px !important;
+  height: 80px !important;
+}
+
+/* 模态框精简 */
+.modal {
+  padding: 20px !important;
+  border-radius: 16px !important;
+}
+
+.modal-title {
+  font-size: 16px !important;
+}
+
+/* 表单精简 */
+.form-group {
+  margin-bottom: 16px !important;
+}
+
+.form-label {
+  font-size: 13px !important;
+  margin-bottom: 6px !important;
+}
